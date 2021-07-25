@@ -1,0 +1,1 @@
+[22-Apr-2021 10:03:06 America/Sao_Paulo] PHP Fatal error:  Maximum execution time of 30 seconds exceeded in /home2/genesisurbana/Imobiliaria/app/Http/Controllers/ReportsController.php on line 268

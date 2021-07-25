@@ -1,0 +1,72 @@
+.cabecalho{
+    max-height: 125px;
+    max-width: 95%;
+}
+
+.cabecalho__logo{
+    width: 125px;
+    height: 125px;
+    float: left;
+    margin: 5px;
+    border: 1px solid black;;
+}
+
+.cabecalho__titulo{
+    text-align: center;
+    float: left;
+    height: 125px;
+    line-height: 125px;
+}
+
+.info{
+    width: 100%;
+    max-width: 95%;
+}
+
+.info_item{
+    width: 25%;
+    float: left;
+}
+
+.info_conteudo{
+    width: 100%;
+    height: 85px;
+    border: 1px solid gray;
+}
+
+.info_titulo{
+    display: block;
+    background-color: gray;
+    color: white;
+    float: left;
+    padding: 5px;
+   
+}
+.info_texto{
+    float: left;
+  
+    padding: 5px;
+    
+}
+
+table{
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+
+}
+.tabelaCabecalho th{
+    padding: 15px;
+    background-color: #337ab7;
+    color: white;
+    font-weight: bold;
+    border-collapse: collapse;
+   
+}
+
+.tabelaLinha td{
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    padding: 15px;
+
+}
+
