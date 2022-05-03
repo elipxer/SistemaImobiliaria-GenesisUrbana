@@ -8,7 +8,7 @@ Escolhi o laravel novamente por seus inúmeros recursos e ao lado de uma bibliot
 A Versão atual é a que se encontra sendo utilizada no dia que esse projeto foi adicionado no git 25/07/2021.
 
 # Instalação
-Primeiramente use o composer update ou composer install para criar a pasta vendor. Após isso importe o arquivo sql agenda.sql no seu banco de dados (Não fiz o uso de migrations por não conhecer ainda). Ao fazer isso, vá no arquivo .env.exemple e mude as configurações para as escolhidas por você. As principais são as citadas abaixo:
+Primeiramente use o composer update ou composer install para criar a pasta vendor. Após isso importe o arquivo sql imobiliaria.sql no seu banco de dados (Não fiz o uso de migrations por não conhecer ainda). Ao fazer isso, vá no arquivo .env.exemple e mude as configurações para as escolhidas por você. As principais são as citadas abaixo:
 
 # ENV Configurações
 ### API_URL="url local ou da hospedagem" 
