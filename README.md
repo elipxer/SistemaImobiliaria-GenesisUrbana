@@ -1,4 +1,4 @@
-# Sistema Imobiliaria-GenesisUrbana
+# Sistema Imobiliaria-Genesis-Urbana
 Sistema de gerenciamento completo para uma imobiliária do Paraná Gênesis Urbana.
 
 O sistema teve seu desenvolvimento feito em laravel 8, usando o template no front Admin LTE. O sistema tem como objetivo gerenciar completamente as atividades da Imobiliaria Genesis Urbana: Seus clientes, as vendas feitas por ele, as parcelas pagas ou atrasadas, um gerador de boletos automatizado e alguns gerenciamentos administrativos internos da empresa. Além de ações feitas por contatos para mudanças de status em cada contrato.
