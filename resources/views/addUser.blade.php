@@ -91,13 +91,11 @@
             
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-4">
-                                    <input class="form-control" id="search_client_input" disabled type="text" placeholder="Digite o nome ou cpf/cnpj do cliente" id="clientName">
-                                </div>
+                               <input class="form-control w-75" id="search_client_input" disabled type="text" placeholder="Digite o nome ou cpf/cnpj do cliente" id="clientName">
                             </div><br>
             
-                            <div class="card" id="clientArea" style="display: none">
-                                <table class="table table-bordered table-hover dataTable dtr-inline" id="clientAreaTable" role="grid" aria-describedby="example2_info">
+                            <div class="card overflow-hidden" id="clientArea" style="display: none">
+                                <table class="table table-responsive table-bordered table-hover dataTable dtr-inline" id="clientAreaTable" role="grid" aria-describedby="example2_info">
                                     <thead class="table table-dark">
                                     <tr role="row">
                                         <th></th>

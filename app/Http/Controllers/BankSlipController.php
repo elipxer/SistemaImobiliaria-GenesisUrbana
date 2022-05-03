@@ -135,6 +135,19 @@ class BankSlipController extends Controller
         if($month <10){
             $month=str_replace('0','',$month);
         }
+        
+        if($month==10){
+            $month="O";
+        }
+
+        if($month==11){
+            $month="N";
+        }
+
+        if($month==12){
+            $month="D";
+        }
+
         $date=$month.date('d');
         $fileName='54725'.$date;
         $ext=$this->returnExtBankSlip();
@@ -171,9 +184,32 @@ class BankSlipController extends Controller
         return $ext;
     }
 
-    public function returnBankSlip(){
+    public function returnBankSlip(Request $request){
         $data['returnBankSlip']=[];
         $allBankSlipReturn=DB::table('bank_slip_return')->get();
+
+        $data['startDate']="";
+        $data['finalDate']="";
+        $data['order']="1";
+
+        if($request->has(['startDate','finalDate','order'])){
+            $startDate=$request->input('startDate');
+            $finalDate=$request->input('finalDate');
+
+            $order=$request->input('order');
+            $orderDescription=$order=="1"?'DESC':'ASC';
+
+            if($request->filled(['startDate','finalDate'])){
+                $allBankSlipReturn=DB::table('bank_slip_return')
+                    ->whereBetween('date',[$startDate,$finalDate])
+                    ->orderBy('date',$orderDescription)->get();
+            }
+
+            $data['order']=$order;
+            $data['startDate']=$startDate;
+            $data['finalDate']=$finalDate;
+        }
+
         foreach ($allBankSlipReturn as $key => $bankSlip) {
             $financial_account=Bank::where('id',$bankSlip->id_financial_account)->first();
             $bankSlipInfo[]=[
@@ -186,15 +222,16 @@ class BankSlipController extends Controller
         return view('return_bankSlip',$data);
     }
 
-    public function returnBankSlipInfo($id_bankSlipReturn){
+    public function returnBankSlipInfo($id_bankSlipReturn,$view=true){
         $data['returnBankSlipInfo']=BankSlipReturnInfo::where('id_bankSlipReturn',$id_bankSlipReturn)->get();
         
         foreach ($data['returnBankSlipInfo'] as $key => $returnBankSlip) {
             $bankReturn=BankSlipReturnInfo::where('id',$returnBankSlip->id)->first();
             if($bankReturn->view==0){
                 $our_number=substr($returnBankSlip->our_number, 3, -1);
-                $parcel=Parcels::where('our_number',$our_number)->first();
-                
+                $deadline=$returnBankSlip->deadLine;
+                $parcel=Parcels::where('our_number',$our_number)->where('date',$deadline)->first();
+               
                 if($returnBankSlip->ocorrency==6 && $parcel != null){
                     $this->changeStatusParcel($parcel->id,$returnBankSlip->amount_received,$returnBankSlip->dateOccorency);
                 }
@@ -203,7 +240,9 @@ class BankSlipController extends Controller
             }
         }
         
-        return view('allReturnBankSlipInfo',$data);
+        if($view){
+            return view('allReturnBankSlipInfo',$data);
+        }
     }
 
     private function changeStatusParcel($idParcel,$amount_received,$occorency_date){
@@ -226,6 +265,7 @@ class BankSlipController extends Controller
                 $file->storeAs($pathFile,$returnFile);
                 $pathFileReturn=$pathFile.$returnFile;
                 $content=Storage::get($pathFileReturn);
+             
                 try {
                     if($data['id_bank']==1){
                         $return = new \Eduardokum\LaravelBoleto\Cnab\Retorno\Cnab400\Banco\Sicredi($content);
@@ -237,7 +277,6 @@ class BankSlipController extends Controller
                     return redirect()->route('returnBankSlip')->withErrors($e->getMessage());
                 }
                 
-                
                 $return->processar();
                 
                 DB::table('bank_slip_return')->insert(['id_financial_account'=>1,
@@ -246,7 +285,6 @@ class BankSlipController extends Controller
                 $idBankSlipReturn=DB::table('bank_slip_return')->max('id');
                 
                 foreach($return->getDetalhes() as $returnFile) {
-                    
                     $our_number=$returnFile->nossoNumero;
                     $occorency=$returnFile->ocorrencia;
                     $descriptionOccorency=$returnFile->ocorrenciaDescricao;
@@ -259,6 +297,7 @@ class BankSlipController extends Controller
                     $value_fine=$returnFile->valorMulta;
                     $value_descont=$returnFile->valorDesconto;
                     $amount_received=$returnFile->valorRecebido;
+                    $error=$returnFile->error;
                     
                     $bankSlipReturn=new BankSlipReturnInfo(); 
                     $bankSlipReturn->id_bankSlipReturn=$idBankSlipReturn;
@@ -276,8 +315,11 @@ class BankSlipController extends Controller
                     $bankSlipReturn->amount_received=$amount_received;
                     $bankSlipReturn->value_descont=$value_descont;
                     $bankSlipReturn->view=0;
+                    $bankSlipReturn->error=$error;
                     $bankSlipReturn->save();
                 }
+
+                $this->returnBankSlipInfo($idBankSlipReturn,false);
             }
         }
         return redirect()->route('returnBankSlip');
@@ -424,7 +466,7 @@ class BankSlipController extends Controller
 
         $sicredi = new \Eduardokum\LaravelBoleto\Boleto\Banco\Sicredi([
             'logo' => "storage/general_icons/LogoGU.png",
-            'dataVencimento' => new Carbon($parcel->date),
+            'dataVencimento' => Carbon::createFromFormat('Y-m-d',$parcel->date),
             'valor' => str_replace('.','',$parcel->updated_value),
             'numero' => $parcel->our_number,
             'numeroDocumento' => $sale->contract_number.' - '.$parcel->num.'/'.$sale->parcels,
@@ -440,7 +482,7 @@ class BankSlipController extends Controller
             'juros' => $data['bank_interest_rate'], // 1% ao mês do valor do boleto
             'jurosApos' => $data['delay_limit'], // quant. de dias para começar a cobrança de juros,
             'desconto'=>$descont,
-            'dataDesconto:'=>new Carbon($parcel->date),
+            'dataDesconto:'=>Carbon::createFromFormat('Y-m-d',$parcel->date),
             'aceite'=>$financial_account->accept,
             'instrucoes' => 
                 [
@@ -588,13 +630,8 @@ class BankSlipController extends Controller
                 $data['endParcel']=$dataFilterParcel['endParcel'];
             }
         }
-
-        $data['sales']=Sales::join('interprises','sales.id_interprise','=','interprises.id')
-        ->join('lots','sales.id_lot','lots.id')
-        ->where('type',2)
-        ->get(['sales.*','interprises.name as interprise_name','lots.lot_number as lot_number'
-           ,'lots.block as lot_block']);
-
+        $data['sales']=[];
+    
         $data['contract_number']="";
         $data['interprise_name']=""; 
         $data['lot_number']="";

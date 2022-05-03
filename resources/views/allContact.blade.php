@@ -12,7 +12,8 @@
                     <thead class="table table-dark">
                         <tr role="row">
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Contrato</th>
-                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Usuario</th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Responsável</th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Cliente</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Via</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Assunto</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Categoria</th>
@@ -25,6 +26,8 @@
                     <tbody>
                         <form method="GET" class="formFilter">
                             <tr>
+                                <td></td>
+                                <td></td>
                                 <td></td>
                                 <td>
                                     <input class="form-control" type="text" name="where" autofocus
@@ -65,6 +68,7 @@
                             <tr>
                                 <td><a href="{{route('seeSale',['idSale'=>$contactItem->id_sale])}}">{{$contactItem->contractNumber}}</a></td>
                                 <td>{{Auth::user()->name}}</td>
+                                <td>{{$contactItem->contact_client_name}}</td>
                                 <td>{{$contactItem->where}}</td>
                                 <td style="max-width: 200px;">{{$contactItem->subject_matter}}</td>
                                 <td>

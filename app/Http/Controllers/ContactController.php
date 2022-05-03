@@ -1079,16 +1079,33 @@ class ContactController extends Controller
         $parcel=new Parcels();
         $parcel->id_sale=$idSale;
         $parcel->num=$numberActualParcel;
-        $parcel->date=$this->maxDayInTheMonth($dateParcel);
+        $correctDateParcel=$this->maxDayInTheMonth($dateParcel);
+        $parcel->date=$correctDateParcel;
         $parcel->value=$valueParcel;
         $parcel->updated_value=$valueParcel;
         $parcel->prefix=$prefix;
         $parcel->status=2;
         $parcel->type=$type;
         $parcel->send_bankSlip=0;
-        $parcel->our_number=rand(10000,99999);
+        $parcel->our_number=$this->createOurNumber($correctDateParcel);
         $parcel->id_contact=$idContact;
         $parcel->save();
+    }
+
+    private function createOurNumber($dateParcel){
+        $isOk=false;
+        $our_number="";
+        
+        while($isOk==false){
+            $our_number=rand(10000,99999);
+            $parcel=Parcels::where('our_number',$our_number)->where('date',$dateParcel)
+            ->where('send_bankSlip',0)->first();
+            if($parcel==null){
+                $isOk=true;
+            }
+        }
+
+        return $our_number;
     }
 
     private function maxDayInTheMonth($date){
@@ -1129,9 +1146,7 @@ class ContactController extends Controller
         if($this->verifyParcelsRefinancingPad($idContact,$data['contact']->id_sale) 
             && $data['contact']->type==4 && $data['contact']->status==2){
             $this->refinancingSuccess($data['contact']->id_sale,$idContact);
-            $data['refinancing_pad']=true;
-        }else{
-            $data['refinancing_pad']=false;
+            return redirect()->route('doneContact',['idContact'=>$idContact]);
         }
 
         if($data['contact']->type==5){
@@ -1141,8 +1156,7 @@ class ContactController extends Controller
 
         $data['padParcels']='';
         if($data['contact']->type==1){
-            $data['padParcels']=$this->verifyParcelsRatePad($idContact);
-            if($data['padParcels'] && $data['contact']->solution != ""){
+            if($data['contact']->solution != "" && $data['contact']->status==1){
                 return redirect()->route('doneContact',['idContact'=>$idContact]);
             }
         }
@@ -1219,14 +1233,14 @@ class ContactController extends Controller
     }
 
     public function severalSolution(Request $request){
-        $data=$request->only(['idContact','solution']);
+        $data=$request->only(['idContact','solution','resolved']);
         if($request->has(['idContact','solution'])){
             $contact=ContactSale::where('id',$data['idContact'])->first();
             $contact->solution=$data['solution'];
-            if($this->verifyParcelsRatePad($data['idContact'])){
+            if($request->filled('resolved')){
                 $contact->status=1;
             }
-                $contact->save();
+            $contact->save();
         }
 
         return redirect()->route('seeContact',['idContact'=>$data['idContact']]);
@@ -1258,13 +1272,7 @@ class ContactController extends Controller
         }
         
         $contact=ContactSale::where('id',$idContact)->first();
-        if($contact->type==1){
-            if($contact->solution != ""){
-                $contact->status=1;
-            }
-        }else{
-            $contact->status=1;
-        }
+        $contact->status=1;
         $contact->save();
 
         return redirect()->route('doneContact',['idContact'=>$idContact]);
@@ -1419,7 +1427,7 @@ class ContactController extends Controller
         $data['change_lot_contact_info_documents']=DB::table('change_lot_info')->where('id_contact',$contact->id)
         ->where('path_document_done',"!=","")->get();
 
-        $data['parcels_rate']=Parcels::where('id_contact',$idContact)->where('type',3)->orwhere('type',2)->get();
+        $data['parcels_rate']=Parcels::where('id_contact',$idContact)->get();
             
         return view('contactsViews.doneContact',$data);
     }

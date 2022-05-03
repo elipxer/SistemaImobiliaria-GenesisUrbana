@@ -63,7 +63,7 @@
                                     Usuarios permitidos:
                                 </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body overflow-auto">
                                 <table class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
                                     <thead class="table table-dark">
                                     <tr role="row">

@@ -59,7 +59,7 @@
                             </div>
                         </div>
 
-                        <div class="card">
+                        <div class="card overflow-auto">
                             <div class="card-header">
                                 <div class="info__title">
                                     Usuarios permitidos:

@@ -622,16 +622,23 @@
                 </div><br>
 
                 <div class="input-info__group">
+                    <div class="input-info__title">Quadra</div>
+                    <div class="input__info">
+                        {{$sale['sale']->lot_block}}
+                    </div>
+                </div><br>
+
+                <div class="input-info__group">
                     <div class="input-info__title">Valor</div>
                     <div class="input__info">
-                        {{$sale['sale']->value}}
+                        {{'R$ '.$sale['sale']->value}}
                     </div>
                 </div><br>
 
                 <div class="input-info__group">
                     <div class="input-info__title">Entrada</div>
                     <div class="input__info">
-                        {{$sale['sale']->input}}
+                        {{'R$ '.$sale['sale']->input}}
                     </div>
                 </div><br>
 
@@ -639,7 +646,7 @@
                 <div class="input-info__group">
                     <div class="input-info__title">Desconto</div>
                     <div class="input__info">
-                        {{$sale['sale']->descont}}
+                        {{'R$ '.$sale['sale']->descont}}
                     </div>
                 </div><br>
 
@@ -653,6 +660,7 @@
                 <div class="input-info__group">
                     <div class="input-info__title">Parcelas Paga</div>
                     <div class="input__info">
+                        {{$sale['parcels_paid']}}
                     </div>
                 </div><br>
 
@@ -683,21 +691,21 @@
                 <div class="input-info__group">
                     <div class="input-info__title">Saldo Devedor</div>
                     <div class="input__info">
-                        {{$sale['rest_value']}}
+                        {{'R$ '.$sale['rest_value']}}
                     </div>
                 </div><br>
 
                 <div class="input-info__group">
                     <div class="input-info__title">Valor Atrasado</div>
                     <div class="input__info">
-                        {{$sale['later_value']}}
+                        {{'R$ '.$sale['later_value']}}
                     </div>
                 </div><br>
 
                 <div class="input-info__group">
                     <div class="input-info__title">Valor Pago</div>
                     <div class="input__info">
-                        {{$sale['paid_value']}}
+                        {{'R$ '.$sale['paid_value']}}
                     </div>
                 </div><br>
 
@@ -767,3 +775,4 @@
 </div>
 @endforeach
 @endsection
+

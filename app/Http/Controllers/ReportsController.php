@@ -495,12 +495,28 @@ class ReportsController extends Controller
         $data['finalDate']="";
         
 
-        if($request->input('startDate') || $request->input('finalDate')){
-            
-            $data['parcels']=Parcels::where('status',"!=",1)
-            ->join('sales','parcels.id_sale','=','sales.id')
-            ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
-            ->orderBy('date','ASC')
+        if($request->hasAny(['startDate','finalDate','startDatePayment','finalDatePayment'])){
+            $parcel=Parcels::query();
+            $parcel->join('sales','parcels.id_sale','=','sales.id');
+            $parcel->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
+
+            if($request->anyFilled(['startDatePayment','finalDatePayment'])){
+                $dataFilterDate=$request->only(['startDate','finalDate','startDatePayment','finalDatePayment']);
+                $parcel->whereBetween('pad_date', [$dataFilterDate['startDatePayment'], $dataFilterDate['finalDatePayment']]);
+            }
+
+            if($request->filled('status')){
+                $status=$request->input('status');
+                $parcel->where('status',$status);
+            }
+
+            if($request->filled('contract_number')){
+                $contract_number=$request->input('contract_number');
+                $parcel->where('contract_number',$contract_number);
+            }
+
+        
+            $data['parcels']=$parcel->orderBy('date','ASC')
             ->get(['parcels.*','sales.parcels as totalParcels',
                 'sales.contract_number as contract_number','sales.id as idSale']);  
             

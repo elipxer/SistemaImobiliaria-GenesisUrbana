@@ -1,4 +1,24 @@
 $(function(){
+    $('#contract').on('click',function(event){
+        event.preventDefault();
+        Swal.fire({
+            title: "Você quer editar o contrato antes de gerar?",
+            icon: 'warning',
+            showDenyButton: true,
+            confirmButtonColor: '#3085d6',
+            denyButtonColor: '#d33',
+            denyButtonText: `Não`,
+            confirmButtonText: 'Sim',
+            customClass: 'mySweetalert',
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location = URL_CONTRACT_EDIT;                
+                } else if (result.isDenied) {
+                    window.location = $(this).attr('href');                
+                }
+            })
+        })
 
     var payParcelForm= $('#payParcelForm');
     $('.btnPayParcel').each(function(){

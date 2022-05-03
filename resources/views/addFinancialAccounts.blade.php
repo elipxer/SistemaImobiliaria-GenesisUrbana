@@ -164,8 +164,8 @@
                             Usuarios permitidos:
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table id="tableUsers" class="table table-bordered table-hover dataTable dtr-inline" role="grid">
+                    <div class="card-body overflow-hidden">
+                        <table id="tableUsers" class="table table-responsive table-bordered table-hover dataTable dtr-inline" role="grid">
                             <thead class="table table-dark">
                             <tr role="row">
                                 <th class="sorting" tabindex="0"  rowspan="1" colspan="1"></th>

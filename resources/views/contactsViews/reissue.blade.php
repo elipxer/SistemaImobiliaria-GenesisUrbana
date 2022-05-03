@@ -26,64 +26,66 @@
                 Parcelas em atraso
             </div>
         </div>
-        <table class="table table-bordered table-hover dataTable dtr-inline" id="table_parcels">
-            <thead class="table table-dark">
-                <th></th>
-                <th>Numero</th>
-                <th>Tipo</th>
-                <th>Vencimento</th>
-                <th>Valor</th>
-                <th>Atraso</th>
-                <th>Multa</th>
-                <th>Juros</th>
-                <th>Reajuste</th>
-                <th>Acrescimo</th>
-                <th>Atualizado</th>
-                <th>Status</th>
-                
-            </thead>
-            <tbody>
-                @foreach ($parcels_late as $parcel)
-                    <tr class={{$parcel->status==3?"table-danger":''}}{{$parcel->type==2 || $parcel->type==3 ?"table-primary":''}}
-                        {{$parcel->status==1?"table-success":''}}
-                        {{$parcel->status==4?"table-warning":''}}
-                        {{$parcel->type==5?"table-info":''}}>
-                        <td>
-                            <center><input id="{{$parcel->id}}" type="checkbox" class="checkParcel"></center>
-                        </td>
-                        <td class="numberParcel" style="width: 50px">{{$parcel->num.'/'.$sale->parcels}}</td>
-                        <td>
-                            @if ($parcel->type==1)
-                                Financiamento - {{$parcel->prefix}}
-                            @elseif($parcel->type==2)
-                                Taxas - {{$parcel->prefix}}
-                            @elseif($parcel->type==5) 
-                                {{$parcel->prefix}}    
-                            @endif</td>
-                        <td>{{date('d/m/Y',strtotime($parcel->date))}}</td>
-                        <td style="min-width: 90px">{{$parcel->value}}</td>
-                        <td style="min-width: 80px;">{{!empty($parcel->late_days)?$parcel->late_days." dias":"0 dias"}}</td>
-                        <td style="min-width: 100px">{{$parcel->late_fine!=""?$parcel->late_fine:'0,00 (0,0%)'}}</td>
-                        <td style="min-width: 115px">{{!empty($parcel->late_rate)?$parcel->late_rate:'0,00 (0,0%)'}}</td>
-                        <td style="min-width: 100px">{{!empty($parcel->reajust)?$parcel->reajust:'0,00 (0,0%)'}}</td>
-                        
-                        <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
-                        <td class="updated_value">{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
-                        <td>
-                            @if ($parcel->status==1)
-                                Paga  
-                            @elseif($parcel->status==2)
-                                Não Paga
-                            @elseif($parcel->status==3) 
-                                Atrasada
-                            @elseif($parcel->status==4) 
-                                Reajustando...    
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="card-body overflow-hidden">
+            <table class="table table-responsive table-bordered table-hover dataTable dtr-inline" id="table_parcels">
+                <thead class="table table-dark">
+                    <th></th>
+                    <th>Numero</th>
+                    <th>Tipo</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Atraso</th>
+                    <th>Multa</th>
+                    <th>Juros</th>
+                    <th>Reajuste</th>
+                    <th>Acrescimo</th>
+                    <th>Atualizado</th>
+                    <th>Status</th>
+                    
+                </thead>
+                <tbody>
+                    @foreach ($parcels_late as $parcel)
+                        <tr class={{$parcel->status==3?"table-danger":''}}{{$parcel->type==2 || $parcel->type==3 ?"table-primary":''}}
+                            {{$parcel->status==1?"table-success":''}}
+                            {{$parcel->status==4?"table-warning":''}}
+                            {{$parcel->type==5?"table-info":''}}>
+                            <td>
+                                <center><input id="{{$parcel->id}}" type="checkbox" class="checkParcel"></center>
+                            </td>
+                            <td class="numberParcel" style="width: 50px">{{$parcel->num.'/'.$sale->parcels}}</td>
+                            <td>
+                                @if ($parcel->type==1)
+                                    Financiamento - {{$parcel->prefix}}
+                                @elseif($parcel->type==2)
+                                    Taxas - {{$parcel->prefix}}
+                                @elseif($parcel->type==5) 
+                                    {{$parcel->prefix}}    
+                                @endif</td>
+                            <td>{{date('d/m/Y',strtotime($parcel->date))}}</td>
+                            <td style="min-width: 90px">{{$parcel->value}}</td>
+                            <td style="min-width: 80px;">{{!empty($parcel->late_days)?$parcel->late_days." dias":"0 dias"}}</td>
+                            <td style="min-width: 100px">{{$parcel->late_fine!=""?$parcel->late_fine:'0,00 (0,0%)'}}</td>
+                            <td style="min-width: 115px">{{!empty($parcel->late_rate)?$parcel->late_rate:'0,00 (0,0%)'}}</td>
+                            <td style="min-width: 100px">{{!empty($parcel->reajust)?$parcel->reajust:'0,00 (0,0%)'}}</td>
+                            
+                            <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
+                            <td class="updated_value">{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
+                            <td>
+                                @if ($parcel->status==1)
+                                    Paga  
+                                @elseif($parcel->status==2)
+                                    Não Paga
+                                @elseif($parcel->status==3) 
+                                    Atrasada
+                                @elseif($parcel->status==4) 
+                                    Reajustando...    
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     
     <form action="{{route('addReissueContact')}}" method="POST" enctype="multipart/form-data">
@@ -131,7 +133,7 @@
                         <div class="info__title">Adicione algum arquivo:</div>
                     </div>
                     <div class="card-body">
-                        <div class="uploadArea">
+                        <div class="uploadArea w-100">
                             <div class="uploadArea__title">Clique ou arraste o arquivo</div>
                             <div class="uploadAreaDrop">
                                 <div class="uploadAreaDrop__img">
@@ -150,8 +152,8 @@
                             Usuario responsavel pelo contato:
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-bordered table-hover dataTable dtr-inline"  role="grid">
+                    <div class="card-body overflow-hidden">
+                        <table class="table table-responsive table-bordered table-hover dataTable dtr-inline"  role="grid">
                             <thead class="table table-dark">
                             <tr role="row">
                                 <th class="sorting" tabindex="0"  rowspan="1" colspan="1"></th>

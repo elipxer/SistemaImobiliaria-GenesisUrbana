@@ -79,7 +79,7 @@
                             x
                         </a>
                     @endif
-                    <div class="info__title">Informações da Venda</div>
+                    <div class="info__title">Informações da Venda - Contrato: {{$sale->contract_number}}</div>
                      
                 </div>
                 
@@ -109,16 +109,23 @@
                     </div><br>
 
                     <div class="input-info__group">
+                        <div class="input-info__title">Quadra</div>
+                        <div class="input__info">
+                            {{$sale->lot_block}}
+                        </div>
+                    </div><br>
+
+                    <div class="input-info__group">
                         <div class="input-info__title">Valor</div>
                         <div class="input__info">
-                            {{$sale->value}}
+                            {{"R$ ".$sale->value}}
                         </div>
                     </div><br>
 
                     <div class="input-info__group">
                         <div class="input-info__title">Entrada</div>
                         <div class="input__info">
-                            {{$sale->input}}
+                            {{"R$ ".$sale->input}}
                         </div>
                     </div><br>
 
@@ -126,7 +133,7 @@
                     <div class="input-info__group">
                         <div class="input-info__title">Desconto</div>
                         <div class="input__info">
-                            {{$sale->descont}}
+                            {{"R$ ".$sale->descont}}
                         </div>
                     </div><br>
 
@@ -243,9 +250,21 @@
 
                     <div class="input-info__group">
                         <div class="input-info__title">Data Proposta</div>
+                        @if(Auth::user()->type!=1)
                         <div class="input__info">
                             {{date('d/m/Y',strtotime($sale->propose_date))}}
                         </div>
+                        @endif
+                        @if(Auth::user()->type==1)
+                            <form method="POST" action="{{route('updateSale')}}" class="input-info__group" action="{}">
+                                @csrf
+                                <div class="input__info">
+                                    <input type="hidden" name="idSale" value="{{$sale->id}}">
+                                    <input type="date" name="propose_date" class="form-control" value="{{$sale->propose_date}}">  
+                                </div>
+                                <input type="submit" class="btn btn-info" value="Salvar"/>
+                            </form>
+                        @endif
                     </div><br>
 
                     <div class="input-info__group">
@@ -274,27 +293,40 @@
         @if($sale->type != 3 && $sale->type != 1)
         <div class="card-header buttons_area--left">
             @if(Auth::user()->type != 2 && Auth::user()->type != 6 && Auth::user()->type != 5)
-            <div class="dropdown dropright">
-                <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Adicionar Contato
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>1,'allContact'=>2])}}">Diversos</a>
-                    @if($sale->type !=4)
-                        <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>6,'allContact'=>2])}}">Reemitir Parcelas</a>
-                        <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>2,'allContact'=>2])}}">Alterar Proprietário</a>
-                        <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>3,'allContact'=>2])}}">Alterar Dia Vencimento</a>
-                        <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>7,'allContact'=>2])}}">Alterar Lote</a>
-                        @if($number_now > 1)
-                            <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>4,'allContact'=>2])}}">Refinanciamento</a>
-                        @endif
-                        @if ($sale->type!=5)
-                            <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>8,'allContact'=>2])}}">Processo Judicial</a>
-                        @endif
-                        <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>5,'allContact'=>2])}}">Cancelar Venda</a>
-                    @endif
+            <div class="row w-100">
+                <div class="col-6">
+                    <div class="dropdown dropright">
+                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Adicionar Contato
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>1,'allContact'=>2])}}">Diversos</a>
+                            @if($sale->type !=4)
+                                <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>6,'allContact'=>2])}}">Reemitir Parcelas</a>
+                                <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>2,'allContact'=>2])}}">Alterar Proprietário</a>
+                                <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>3,'allContact'=>2])}}">Alterar Dia Vencimento</a>
+                                <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>7,'allContact'=>2])}}">Alterar Lote</a>
+                                @if($number_now > 1)
+                                    <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>4,'allContact'=>2])}}">Refinanciamento</a>
+                                @endif
+                                @if ($sale->type!=5)
+                                    <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>8,'allContact'=>2])}}">Processo Judicial</a>
+                                @endif
+                                <a class="dropdown-item" href="{{route('addView',['idSale'=>$sale->id, 'type'=>5,'allContact'=>2])}}">Cancelar Venda</a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
+                <form class="col-6" style="display:flex; justify-content:flex-end;" method="get">
+                    <div class="form-group mr-3">
+                        <input type="checkbox" name="justResolved" {{isset($justResolved)?'checked':''}}> Ocultar Resolvidos
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-success" type="submit" value="Filtrar">
+                    </div>
+                </form>
             </div>
+        
             @endif
         </div>
         @endif
@@ -303,7 +335,8 @@
                 <table class="table table-bordered table-hover dataTable dtr-inline" role="grid">
                     <thead class="table table-dark">
                         <tr role="row">
-                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Usuario</th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Responsável</th>
+                            <th class="sorting" tabindex="0" rowspan="1" colspan="1">Cliente</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Via</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Assunto</th>
                             <th class="sorting" tabindex="0" rowspan="1" colspan="1">Categoria</th>
@@ -317,6 +350,7 @@
                         @foreach ($contact as $contactItem)
                             <tr>
                                 <td>{{$contactItem->user_name}}</td>
+                                <td>{{$contactItem->contact_client_name}}</td>
                                 <td>{{$contactItem->where}}</td>
                                 <td style="max-width: 200px;">{{$contactItem->subject_matter}}</td>
                                 <td>
@@ -667,7 +701,9 @@
                                         idParcel={{$parcel->id}} value={{$parcel->value}}></div>
                                     @endif
                                 </td>
-                                <td style="width: 50px">{{$parcel->num!=""?$parcel->num.'/'.$sale->parcels:$parcel->num_reissue}}</td>
+                                <td style="width: 50px">
+                                    {{$parcel->num!=""?$parcel->num.'/'.$sale->parcels:$parcel->num_reissue}}
+                                </td>
                                 <td>
                                     @if ($parcel->type==1)
                                         Financiamento - {{$parcel->prefix}}
@@ -688,7 +724,13 @@
                                 
                                 <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
                                 <td>{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
-                                <td>{{!empty($parcel->pad_value)?$parcel->pad_value:'0,00'}}</td>
+                                <td>
+                                    @if($parcel->send_bankSlip==0)
+                                        {{!empty($parcel->pad_value)?str_replace(['.','.'],['',','],$parcel->pad_value):'0,00'}}
+                                    @else
+                                        {{!empty($parcel->pad_value)?str_replace(['.','.'],[',',','],$parcel->pad_value):'0,00'}}
+                                    @endif
+                                </td>
                                 <td>{{!empty($parcel->pad_date)?date('d/m/Y',strtotime($parcel->pad_date)):'Não Pago'}}</td>
                                 <td>
                                     @if($parcel['bankSlip'])
@@ -825,6 +867,9 @@
   
 
     @section('js')
+        <script>
+            const URL_CONTRACT_EDIT="{{route('contractEditSale',['id_sale'=>$sale->id])}}";
+        </script>
         @if($errors->any())
             <script>
                 Swal.fire({

@@ -14,6 +14,7 @@
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Nosso Numero</th>
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Cod Ocorrência</th>
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Descrição Ocorrência</th>
+                        <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Erro Ocorrência</th>
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Data Ocorrência</th>
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Data Vencimento</th>
                         <th class="sorting" tabindex="0"  rowspan="1" colspan="1">Data Crédito</th>
@@ -31,6 +32,7 @@
                             <td>{{$bankSlip->our_number}}</td>
                             <td>{{$bankSlip->ocorrency}}</td>
                             <td>{{$bankSlip->ocorrencyDescription}}</td>
+                            <td>{{$bankSlip->error!=""?$bankSlip->error:'Nenhum Erro'}}</td>
                             <td>{{$bankSlip->dateOccorency!=""?date('d/m/Y',strtotime($bankSlip->dateOccorency)):""}}</td>
                             <td>{{$bankSlip->deadLine!=""?date('d/m/Y',strtotime($bankSlip->deadLine)):""}}</td>
                             <td>{{$bankSlip->creditDate!=""?date('d/m/Y',strtotime($bankSlip->creditDate)):""}}</td>

@@ -116,4 +116,17 @@ class AjaxController extends Controller
        
         echo json_encode($bankSlipArray);
     }
+
+    public function contractSaleHtml(Request $request){
+        $content=$request->input('content');
+        $idSale=$request->input('idSale');
+
+        if($request->filled(['content','idSale'])){
+            $sale=Sales::where('id',$idSale)->first();
+            $sale->html_contract=$content;
+            $sale->save();
+        }
+
+        return true;
+    }
 }

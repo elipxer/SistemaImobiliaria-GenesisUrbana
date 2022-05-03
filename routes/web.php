@@ -77,9 +77,11 @@ Route::prefix('/')->group(function(){
     Route::post('/getCpf',[AjaxController::class,'verifyClientExist'])->name('verifyClientExist');
     Route::post('/getAllClients',[AjaxController::class,'getAllClients'])->name('getAllClients');
     Route::post('/getBankSlip',[AjaxController::class,'getBankSlip'])->name('getBankSlip');
+    Route::post('/contract_sale_html',[AjaxController::class,'contractSaleHtml'])->name('contractSaleHtml');
 
     Route::get('/allSales',[SalesController::class,'index'])->name('allSales');
     Route::any('/addSale',[SalesController::class,'add'])->name('addSale');
+    Route::post('/updateSale',[SalesController::class,'updateSale'])->name('updateSale');
     Route::post('/verifyContract',[AjaxController::class,'verifyContractNumber'])->name('verifyContractNumber');
     Route::get('/seeSale/{idSale}/{idJuridical?}',[SalesController::class,'seeSale'])->name('seeSale');
     Route::post('/finishContractSale',[SalesController::class,'finishContractSale'])->name('finishContractSale');
@@ -132,7 +134,8 @@ Route::prefix('/')->group(function(){
     Route::any('/editFinancialAccounts/{idAccount}',[FinancialAccountsController::class,'editFinancialAccounts'])->name('editFinancialAccounts');
     Route::get('/deleteAccounts/{idAccount}',[FinancialAccountsController::class,'deleteAccounts'])->name('deleteAccounts');
 
-    Route::get('/contract_sale/{id_sale}',[ContractsController::class,'contractSale'])->name('contractSale');
+    Route::get('/edit_contract_sale/{id_sale}',[ContractsController::class,'contractEditSale'])->name('contractEditSale');
+    Route::get('/contract_sale/{id_sale}/{edit?}',[ContractsController::class,'contractSale'])->name('contractSale');
     Route::get('/contract_cancel/{id_contact}',[ContractsController::class,'contractCancel'])->name('contractCancel');
     Route::get('/contract_change_owner/{id_contact}',[ContractsController::class,'contractChangeOwner'])->name('contractChangeOwner');
     Route::get('/contract_change_lot/{id_contact}',[ContractsController::class,'contractChangeLot'])->name('contractChangeLot');

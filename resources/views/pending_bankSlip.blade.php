@@ -10,6 +10,7 @@
                 </div>
                   
                 <div class="col-6" style="text-align: right">
+                    <button class="btn btn-success" id="btnSelectAll">Selecionar Todas</button>
                     <a href="{{route('sendBankSlip')}}" class="btn btn-success backButton">Voltar</a>  
                 </div>
               </div>

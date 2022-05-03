@@ -65,9 +65,15 @@ class SalesController extends Controller
         $dataSalesLike=$request->only(['contract_number','interprise_name','lot_number','block']);
         $dataSaleEquals = $request->only('date','type');
         
-
-        if($request->hasAny(['contract_number','interprise_name','lot_number','block','type','sales.date'])){
-            $query=Sales::join('interprises','sales.id_interprise','=','interprises.id')
+        $data['orderContract']=0;
+        $data['orderLot']=0;
+        $data['orderBlock']=0;
+        $data['orderInterprise']=0;
+        
+        if($request->hasAny(['contract_number','interprise_name','lot_number','block','type',
+            'sales.date','orderContract','orderLot','orderBlock','orderInterprise'])){
+            
+            $query=Sales::join('interprises','sales.id_interprise','=','interprises.id',)
                         ->join('lots','sales.id_lot','lots.id');
             
             foreach ($dataSalesLike as $name => $value) {
@@ -87,9 +93,47 @@ class SalesController extends Controller
                     $query->where($name, '=', $value);
                 }
             }
+
+            $query->where('type','!=',0);
             
-            $data['sales']=$query->where('type','!=',0)
-                ->get(['sales.*','interprises.name as interprise_name','lots.lot_number as lot_number'
+            if($request->input('orderContract') != 0 || $request->input('orderLot') != 0 
+                || $request->input('orderBlock') != 0 || $request->input('orderInterprise')){
+
+                $orderContract= $request->input('orderContract');
+                $orderLot= $request->input('orderLot');
+                $orderBlock= $request->input('orderBlock');
+                $orderInterprise= $request->input('orderInterprise');
+
+                $type=0;
+
+                if($orderContract != 0){
+                    $type=1;
+                    $query=$this->filterOrderBy($query,$type,$orderContract);
+                }
+
+                if($orderLot != 0){
+                    $type=2;
+                    $query=$this->filterOrderBy($query,$type,$orderLot);
+                }
+
+                if($orderBlock != 0){
+                    $type=3;
+                    $query=$this->filterOrderBy($query,$type,$orderBlock);
+                }
+
+                if($orderInterprise != 0){
+                    $type=4;
+                    $query=$this->filterOrderBy($query,$type,$orderInterprise);
+                }
+                
+                $data['orderContract']=$orderContract;
+                $data['orderLot']=$orderLot;
+                $data['orderBlock']=$orderBlock;
+                $data['orderInterprise']=$orderInterprise;
+            }    
+            
+            
+            $data['sales']=$query->get(['sales.*','interprises.name as interprise_name','lots.lot_number as lot_number'
                 ,'lots.block as lot_block']);
 
             $data['contract_number']=$dataSalesLike['contract_number'];
@@ -142,6 +186,16 @@ class SalesController extends Controller
         }
         
         return view('allSales',$data);
+    }
+
+    private function filterOrderBy($query,$type,$order){
+        $orderValue=[0=>'',1=>'ASC',2=>'DESC'];
+        $typeOrder=[0=>'',1=>'contract_number',2=>'lots.lot_number',3=>'lots.block',4=>'interprise_name'];
+       
+        $orderValue=strval($orderValue[$order]);
+        $typeOrder=strval($typeOrder[$type]);
+        
+        return $query->orderBy($typeOrder,$orderValue);
     }
 
     private function filterClients($sales,$name_client){
@@ -247,9 +301,28 @@ class SalesController extends Controller
 
     public function suspendSale($idSale){
         if(!empty($idSale)){
+            $parcels=Parcels::where('id_sale',$idSale)->get();
+            foreach ($parcels as $key => $parcel) {
+                $parcel->delete();
+            }
+
+            $bankSlips=BankSlip::where('id_sale',$idSale)->get();
+            foreach ($bankSlips as $key => $bankSlip) {
+                $bankSlip->delete();
+            }
+
+            DB::table('cancel_contact_info')->where('id_sale',$idSale)->delete();
+           
+            DB::table('change_lot_info')->where('id_sale',$idSale)->delete();
+            DB::table('juridical_contacts')->where('id_sale',$idSale)->delete();
+            DB::table('notification_index_value')->where('id_sale',$idSale)->delete();
+          
+            DB::table('refinancing_info')->where('id_sale',$idSale)->get();
+            DB::table('reissue_contact_info')->where('id_sale',$idSale)->delete();
+            DB::table('contact_sale')->where('id_sale',$idSale)->delete();
+          
             $sale=Sales::where('id',$idSale)->first();
-            $sale->type=0;
-            $sale->save();
+            $sale->delete();
 
             $lot=Lot::where('id',$sale->id_lot)->first(); 
             $lot->available=1;
@@ -374,7 +447,7 @@ class SalesController extends Controller
                 }else{
                     if($parcel==$numberParcels){
                         break;
-                     }
+                    }
                     $finalDate=$year."-".$month."-".$expiredDay;
                     
                     $parcel++;
@@ -388,14 +461,30 @@ class SalesController extends Controller
         $parcel=new Parcels();
         $parcel->id_sale=$idSale;
         $parcel->num=$numberActualParcel;
-        $parcel->date=$this->maxDayInTheMonth($dateParcel);
+        $correctDateParcel=$this->maxDayInTheMonth($dateParcel);
+        $parcel->date=$correctDateParcel;
         $parcel->value=$valueParcel;
         $parcel->updated_value=$valueParcel;
         $parcel->status=2;
         $parcel->type=1;
         $parcel->send_bankSlip=0;
-        $parcel->our_number=rand(10000,99999);
+        $parcel->our_number=$this->createOurNumber($correctDateParcel);
         $parcel->save();
+    }
+
+    private function createOurNumber($dateParcel){
+        $isOk=false;
+        $our_number="";
+        
+        while($isOk==false){
+            $our_number=rand(10000,99999);
+            $parcel=Parcels::where('our_number',$our_number)->where('date',$dateParcel)->where('send_bankSlip',0)->first();
+            if($parcel==null){
+                $isOk=true;
+            }
+        }
+
+        return $our_number;
     }
 
     private function maxDayInTheMonth($date){
@@ -513,17 +602,38 @@ class SalesController extends Controller
         }
         
         if(Auth::user()->type == 6){
+            
             $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
                         ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)->orderBy('status','DESC')
                         ->get(['contact_sale.*','users.name as user_name']);
             
+            if($request->filled('justResolved')){
+                $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
+                ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)
+                ->where('contact.sales.status','!=',1)
+                ->orderBy('contact.sales.status','DESC')
+                ->get(['contact_sale.*','users.name as user_name']);
+
+                $data['justResolved']=true;
+
+            }
+
             if($this->verifySaleUserClient($idSale)==false){
                 return redirect()->route('allSales');
             }            
          }else if(Auth::user()->type!=6){
             $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
-                        ->where('id_sale',$idSale)->orderBy('status','DESC')
-                        ->get(['contact_sale.*','users.name as user_name']);
+                    ->where('id_sale',$idSale)->orderBy('status','DESC')
+                    ->get(['contact_sale.*','users.name as user_name']);
+            
+            if($request->filled('justResolved')){
+                $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
+                ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)
+                ->where('contact_sale.status','!=',1)->orderBy('contact_sale.status','DESC')
+                ->get(['contact_sale.*','users.name as user_name']);
+
+                $data['justResolved']=true;
+            }        
          }
         
         if($data['sale']->type==3){
@@ -582,6 +692,19 @@ class SalesController extends Controller
         return view('seeSale',$data);
     }
 
+    public function updateSale(Request $request){
+        $dataSale=$request->only(['idSale','propose_date']);
+        
+        $idSale=$dataSale['idSale'];
+        $proposeDate=$dataSale['propose_date'];
+    
+        $sale=Sales::where('id',$idSale)->first();
+        $sale->propose_date=$proposeDate;
+        $sale->save();
+
+        return redirect()->route('seeSale',['idSale'=>$idSale]);
+    }
+
     private function verifyFinishSale($idSale){
         $sale=Sales::where('id',$idSale)->first();
         $parcelsSale=count(Parcels::where('id_sale',$idSale)->where('status',1)->get());
@@ -606,14 +729,15 @@ class SalesController extends Controller
     }   
 
     private function getRestValue($idSale){
-        $data['parcels']=Parcels::where('id_sale',$idSale)->where('status',2)->orwhere('status',3)->get();
+        $data['parcels']=Parcels::where('id_sale',$idSale)->get()->except('status',1);
+       
         $valuesParcels=[];
         foreach ($data['parcels'] as $key => $parcel) {
             $updated_value=floatVal(str_replace(['.',','],['','.'],$parcel->updated_value));
             $valuesParcels[]=$updated_value;
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
     private function getPaidValue($idSale){
@@ -625,7 +749,7 @@ class SalesController extends Controller
             $valuesParcels[]=floatVal($updated_value);
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
     private function getLaterValue($idSale){
@@ -637,7 +761,7 @@ class SalesController extends Controller
             $valuesParcels[]=floatVal($updated_value);
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
     private function verifyLateParcel($parcels){
@@ -828,28 +952,36 @@ class SalesController extends Controller
             return redirect()->route('accessDenied');
         }
 
-        $data['parcels']=Parcels::where('status',"!=",1)
-            ->join('sales','parcels.id_sale','=','sales.id')
+        $dataFilterDate=$request->only(['startDate','finalDate','startDatePayment','finalDatePayment']);
+        $data['startDate']=date('Y-m-d',strtotime('-2 month'));
+        $data['finalDate']=date('Y-m-d',strtotime('+2 month'));
+
+        $data['parcels']=Parcels::join('sales','parcels.id_sale','=','sales.id')
+            ->whereBetween('date', [$data['startDate'], $data['finalDate']])
             ->orderBy('date','ASC')
             ->get(['parcels.*','sales.parcels as totalParcels',
                 'sales.contract_number as contract_number','sales.id as idSale']);        
         
-        $dataFilterDate=$request->only(['startDate','finalDate']);
-        $data['startDate']="";
-        $data['finalDate']="";
-
         $orderFilter=$request->only(['contractCheck','deadlineCheck','paymentDateCheck']);
         $data['contractCheck']="";
         $data['deadlineCheck']="";
         $data['paymentDateCheck']="";
+
+        $data['startDatePayment']='';
+        $data['finalDatePayment']='';
         
-        if($request->input('startDate') || $request->input('finalDate')){
+        if($request->hasAny(['startDate','finalDate','startDatePayment','finalDatePayment'])){
             $query=Parcels::query();
             
-            $data['parcels']=$query->where('status',"!=",1)
-            ->join('sales','parcels.id_sale','=','sales.id')
+            $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
             ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
-           
+            
+            if($request->hasAny(['startDatePayment','finalDatePayment'])){
+                $dataFilterDate=$request->only(['startDate','finalDate','startDatePayment','finalDatePayment']);
+                $query->whereBetween('pad_date', [$dataFilterDate['startDatePayment'], $dataFilterDate['finalDatePayment']]);
+            }
+
+
             if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
                 foreach ($orderFilter as $name => $value) {
                     if($name=="contractCheck"){
@@ -873,18 +1005,19 @@ class SalesController extends Controller
             $data['parcels']=$query->orderBy('date','ASC')
             ->get(['parcels.*','sales.parcels as totalParcels',
                 'sales.contract_number as contract_number','sales.id as idSale']);  
-            
-            $data['startDate']=$dataFilterDate['startDate'];
-            $data['finalDate']=$dataFilterDate['finalDate'];
-            $data['contractCheck']=$request->has('contractCheck')?$orderFilter['contractCheck']:'';
-            $data['deadlineCheck']=$request->has('deadlineCheck')?$orderFilter['deadlineCheck']:'';
-            $data['paymentDateCheck']=$request->has('paymentDateCheck')?$orderFilter['paymentDateCheck']:'';
+
         }
 
-       
-        
-        if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck']) 
-            && $request->input('startDate')==false || $request->input('finalDate')==false){
+         
+        $data['startDate']=$request->has('startDate')?$dataFilterDate['startDate']:$data['startDate'];
+        $data['finalDate']=$request->has('finalDate')?$dataFilterDate['finalDate']:$data['finalDate'];
+        $data['startDatePayment']=$request->has('startDatePayment')?$dataFilterDate['startDatePayment']:'';
+        $data['finalDatePayment']=$request->has('finalDatePayment')?$dataFilterDate['finalDatePayment']:'';
+        $data['contractCheck']=$request->has('contractCheck')?$orderFilter['contractCheck']:'';
+        $data['deadlineCheck']=$request->has('deadlineCheck')?$orderFilter['deadlineCheck']:'';
+        $data['paymentDateCheck']=$request->has('paymentDateCheck')?$orderFilter['paymentDateCheck']:'';
+
+       if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck','laterParcel'])){
             $query=Parcels::query();
             foreach ($orderFilter as $name => $value) {
                 if($name=="contractCheck"){
@@ -905,6 +1038,7 @@ class SalesController extends Controller
             }
 
             $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
+            ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
             ->orderBy('date','ASC')
             ->get(['parcels.*','sales.parcels as totalParcels',
             'sales.contract_number as contract_number','sales.id as idSale']);
@@ -971,9 +1105,11 @@ class SalesController extends Controller
                         }
                     }
                 }
-
+                
+                
                 $data['parcels']=$query->where('status',"!=",1)
                     ->join('sales','parcels.id_sale','=','sales.id')
+                    ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
                     ->orderBy('date','ASC')
                     ->get(['parcels.*','sales.parcels as totalParcels',
                     'sales.contract_number as contract_number','sales.id as idSale']);
@@ -1001,19 +1137,21 @@ class SalesController extends Controller
                         }
                     }
                 }
-
-            $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
-                ->orderBy('date','ASC')
-                ->get(['parcels.*','sales.parcels as totalParcels',
-                'sales.contract_number as contract_number','sales.id as idSale']);
+                
+                $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
+                    ->orderBy('date','ASC')
+                    ->get(['parcels.*','sales.parcels as totalParcels',
+                    'sales.contract_number as contract_number','sales.id as idSale']);
+                }
+                $data['num']=$dataParcelsEquals['num'];
+                $data['date']=$dataParcelsEquals['date'];
+                $data['status']=$dataParcelsEquals['status'];
+                $data['contract_number']=$dataParcelsLike['contract_number'];
+                $data['pad_date']=$dataParcelsEquals['pad_date'];
+                $data['our_number']=$dataParcelsLike['our_number'];
             }
-            $data['num']=$dataParcelsEquals['num'];
-            $data['date']=$dataParcelsEquals['date'];
-            $data['status']=$dataParcelsEquals['status'];
-            $data['contract_number']=$dataParcelsLike['contract_number'];
-            $data['pad_date']=$dataParcelsEquals['pad_date'];
-            $data['our_number']=$dataParcelsLike['our_number'];
-        }
+
+        
 
         $this->verifyLateParcel($data['parcels']);
         $data['banks']=Bank::where('status',1)->get();
@@ -1031,8 +1169,6 @@ class SalesController extends Controller
         return view('allParcels',$data);
     }
     
-   
-
     public function payParcel(Request $request){
         $data=$request->only(['id','pad_value','pad_date','pad_description','allParcels','idBank']);
         $request->validate([

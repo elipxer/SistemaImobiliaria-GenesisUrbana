@@ -300,10 +300,11 @@
                     <form action="{{route('updateContactFile')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="idContact" value="{{$contact->id}}">
+                        <input type="hidden" name="edit" value="false">
                         <div class="card-body">
-                            <div class="uploadArea">
+                            <div class="uploadArea w-100">
                                 <div class="uploadArea__title">Clique ou arraste o arquivo</div>
-                                <div class="uploadAreaDrop">
+                                <div class="uploadAreaDrop w-100">
                                     <div class="uploadAreaDrop__img">
                                         <img src="{{asset('storage/general_icons/file.png')}}" width="70%" height="70%">
                                     </div>
@@ -439,7 +440,7 @@
         </div>
 
         <div class="col-6">
-            @if ($contact->type==1 && $contact->solution == "")
+            @if ($contact->type==1)
             <div class="card" id="card_several-solution">
                 <div class="card-header ">
                     <div class="info__title">
@@ -451,7 +452,11 @@
                         @csrf
                         <input type="hidden" name="idContact" value="{{$contact->id}}">
                         <div class="form-group">
-                            <textarea class="form-control" name="solution" rows="10"></textarea>
+                            <textarea class="form-control" name="solution" rows="10">{{$contact->solution}}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Definir como resolvido</label>
+                            <input class="ml-2" type="checkbox" name="resolved"/>
                         </div>
                         <div class="card-footer">
                             <center><input type="submit" class="btn btn-success btn-lg w-25" 
@@ -462,121 +467,98 @@
             </div>
             @endif
 
-            @if ($contact->type==1 && $padParcels==false)
-            <div class="card" id="card_several">
-                <div class="card-header">
-                    <div class="info__title alert alert-danger">
-                        O sistema identificou que as taxas desse contato ainda não foram pagas. 
-                        Caso o cliente pagou, você pode confirmar e o contato ficará como resolvido.
-                    </div>
-
-                    <div class="card-body">
-                        <form action="{{route('forcePayParcelsRate')}}" 
-                            method="POST" enctype="multipart/form-data" id="severalContact">
-                        @csrf
-                        <input type="hidden" name="idContact" value="{{$contact->id}}">
-                        <div class="card-footer">
-                            <center><input type="submit" class="btn btn-danger btn-lg w-25" 
-                                id="btnSeveral" value="Confirmar"></center>
-                        </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            @endif
-
             @if ($contact->type==4)
-            <div class="card">
-                <div class="card-header">
-                    <div class="info__title">
-                        Informações do Refinanciamento
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Valor Total</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->total_value}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Numero de parcelas</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->number_parcels}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Valor parcelas</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->value_parcel}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Data Registrado</div>
-                                <div class="input__info">
-                                    {{date('d/m/Y',strtotime($refinancing_info->date))}}
-                                </div>
-                            </div><br>
-                        </div>
-                        <div class="col-6">
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Porcentagem da taxa</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->value_fine_percentage}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Numero parcelas taxa</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->number_parcels_fine}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Valor da taxa</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->value_fine}}
-                                </div>
-                            </div><br>
-
-                            <div class="input-info__group w-100">
-                                <div class="input-info__title">Hora Registrado</div>
-                                <div class="input__info">
-                                    {{$refinancing_info->time}}
-                                </div>
-                            </div><br>
-                            
+                <div class="card">
+                    <div class="card-header">
+                        <div class="info__title">
+                            Informações do Refinanciamento
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="card" id="card_refinancing">
-                <div class="card-header">
-                    <div class="info__title alert alert-danger">
-                        O sistema identificou que as parcelas do refinanciamento ainda não foram pagas. 
-                        Caso o cliente pagou, você pode confirmar o refinanciamento logo abaixo.
-                    </div>
-
                     <div class="card-body">
-                        <form action="{{route('refinancingSuccess',['idContact'=>$contact->id
-                            ,'idSale'=>$contact->id_sale,'forceConfirm'=>true])}}" 
-                            method="GET" enctype="multipart/form-data" id="refinancingContact">
-                        @csrf
-                        <div class="card-footer">
-                            <center><input type="submit" class="btn btn-danger btn-lg w-25" 
-                                id="btnRefinancing" value="Confirmar"></center>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Valor Total</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->total_value}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Numero de parcelas</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->number_parcels}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Valor parcelas</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->value_parcel}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Data Registrado</div>
+                                    <div class="input__info">
+                                        {{date('d/m/Y',strtotime($refinancing_info->date))}}
+                                    </div>
+                                </div><br>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Porcentagem da taxa</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->value_fine_percentage}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Numero parcelas taxa</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->number_parcels_fine}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Valor da taxa</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->value_fine}}
+                                    </div>
+                                </div><br>
+
+                                <div class="input-info__group w-100">
+                                    <div class="input-info__title">Hora Registrado</div>
+                                    <div class="input__info">
+                                        {{$refinancing_info->time}}
+                                    </div>
+                                </div><br>
+                                
+                            </div>
                         </div>
-                        </form>
                     </div>
                 </div>
-            </div>
+
+                <div class="card" id="card_refinancing">
+                    <div class="card-header">
+                        <div class="info__title alert alert-danger">
+                            O sistema identificou que as parcelas do refinanciamento ainda não foram pagas. 
+                            Caso o cliente pagou, você pode confirmar o refinanciamento logo abaixo.
+                        </div>
+
+                        <div class="card-body">
+                            <form action="{{route('refinancingSuccess',['idContact'=>$contact->id
+                                ,'idSale'=>$contact->id_sale,'forceConfirm'=>true])}}" 
+                                method="GET" enctype="multipart/form-data" id="refinancingContact">
+                            @csrf
+                            <div class="card-footer">
+                                <center><input type="submit" class="btn btn-danger btn-lg w-25" 
+                                    id="btnRefinancing" value="Confirmar"></center>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             @endif
 
             @if ($contact->type==5)
@@ -810,7 +792,7 @@
                             @csrf
                             <input type="hidden" name="id_contact" value="{{$contact->id}}">
                             <div class="card-footer">
-                                <center><input type="submit" class="btn btn-success btn-lg w-25" 
+                                <center><input type="submit" class="btn btn-success btn-lg w-50" 
                                     id="btnReissue" value="Confirmar"></center>
                             </div>
                             </form>

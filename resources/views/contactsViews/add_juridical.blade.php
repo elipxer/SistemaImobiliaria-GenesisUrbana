@@ -24,6 +24,7 @@
                 <div class="card-header">
                     <div class="info__title">Situação do Contrato</div>
                 </div>
+                <div class="card-body">
                 <form action="{{route('addJuridicalContact')}}" class="optionFineForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id_sale" value={{$idSale}}>
@@ -32,6 +33,7 @@
                         <textarea class="form-control" autofocus name="situation"  cols="30" rows="10">{{old('situation')}}</textarea>
                     </div>
                 </div>
+            </div>
 
             <div class="card">
                 <div class="card-header">
@@ -85,7 +87,7 @@
                     <div class="info__title">Adicione algum arquivo:</div>
                 </div>
                 <div class="card-body">
-                    <div class="uploadArea">
+                    <div class="uploadArea w-100">
                         <div class="uploadArea__title">Clique ou arraste o arquivo</div>
                         <div class="uploadAreaDrop">
                             <div class="uploadAreaDrop__img">

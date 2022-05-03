@@ -22,7 +22,7 @@ class ContractsController extends Controller
 
     }
     
-    public function contractSale($id_sale){
+    public function contractSale($id_sale,$edit=false){
         $sale=Sales::where('id',$id_sale)->first();
         $data['sale']=$sale;
         $interprise=Interprises::where('id',$sale->id_interprise)->first();
@@ -72,9 +72,72 @@ class ContractsController extends Controller
         $data['now']=date('d')." de ".$month[intVal(date('m'))]." de ".date('Y');
 
         $mpdf= new Mpdf();
-        $mpdf->WriteHTML(View::make('contracts.contract_sale',$data)->render());
+        if($sale->html_contract != "" && $edit){
+            $mpdf->WriteHTML($sale->html_contract);
+        }else{
+            $mpdf->WriteHTML(View::make('contracts.contract_sale',$data)->render());
+        }
+        
         $mpdf->SetDisplayMode('fullpage');
         return $mpdf->Output('contrato_venda.pdf', 'I');
+    }
+
+    public function contractEditSale($id_sale){
+        $sale=Sales::where('id',$id_sale)->first();
+        $sale->html_contract="";
+        $sale->save();
+
+        $data['sale']=$sale;
+        $interprise=Interprises::where('id',$sale->id_interprise)->first();
+        $companies_interprise_ids=explode(',',$interprise->company_ids);
+       
+        $data['companies']=[];
+        foreach ($companies_interprise_ids as $key => $id) {
+            $company=Companies::where('id',$id)->first();
+            $data['companies'][]=$company;
+        }
+
+        $clients_ids=explode(',',$sale->clients);
+        $data['clients']=[];
+        foreach ($clients_ids as $key => $id) {
+            $client=Clients::where('id',$id)->first();
+            $client_representative=Clients::where('id',$client->id_representative)->first();
+            if($client->id_representative == null){
+                $client_representative==null;
+            }
+            $clientArray[]=[
+                'client'=>$client,
+                'client_representative'=>$client_representative
+            ];
+            
+            $data['clients']=$clientArray;
+        }
+
+        $data['lot']=Lot::where('id',$sale->id_lot)->first();
+        $data['interprise']=Interprises::where('id',$sale->id_interprise)->first();
+
+        $month = [
+            1=>'Janeiro',
+            'Fevereiro',
+            'Março',
+            'Abril',
+            'Maio',
+            'Junho',
+            'Julho',
+            'Agosto',
+            'Setembro',
+            'Outubro',
+            'Novembro',
+            'Dezembro'
+        ];
+
+
+        $data['now']=date('d')." de ".$month[intVal(date('m'))]." de ".date('Y');
+
+        $content=View::make('contracts.contract_sale',$data);
+       
+        $data['content']=$content;
+        return view('contracts.edit_contract',$data);
     }
 
     public function contractCancel($id_contact){

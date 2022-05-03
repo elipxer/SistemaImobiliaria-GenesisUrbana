@@ -40,7 +40,10 @@ class HomeController extends Controller
     public function index(){
         
         $data['contact']=ContactSale::join('sales','sales.id','=','contact_sale.id_sale')
-            ->where('id_user',Auth::user()->id)->where('status',2)->get(['contact_sale.*','sales.contract_number as contract_number']);;
+            ->where('id_user',Auth::user()->id)
+            ->where('status',2)
+            ->where('solution',null)
+            ->get(['contact_sale.*','sales.contract_number as contract_number']);;
         
         $data['typeContact']=[
             1=>"Diversos",

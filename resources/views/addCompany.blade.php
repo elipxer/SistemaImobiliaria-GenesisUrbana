@@ -135,51 +135,53 @@
                                             </div>
                                           </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="representative_cep">Cep</label>
-                                        <input type="text" class="form-control cep w-25" name="representative_cep" 
-                                            id="representative_cep" value="{{old('representative_cep')}}">
-                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="representative_cep">Cep</label>
+                                            <input type="text" class="form-control cep w-25" name="representative_cep" 
+                                                id="representative_cep" value="{{old('representative_cep')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_street">Rua</label>
-                                        <input type="text" class="form-control w-50" name="representative_street" 
-                                            id="representative_street" value="{{old('representative_street')}}">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="representative_street">Rua</label>
+                                            <input type="text" class="form-control w-50" name="representative_street" 
+                                                id="representative_street" value="{{old('representative_street')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_number">Numero</label>
-                                        <input type="text" class="form-control w-25" name="representative_number" 
-                                            id="representative_number" value="{{old('representative_number')}}">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="representative_number">Numero</label>
+                                            <input type="text" class="form-control w-25" name="representative_number" 
+                                                id="representative_number" value="{{old('representative_number')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_complement">Complemento</label>
-                                        <input type="text" class="form-control w-50" name="representative_complement" 
-                                            id="representative_complement" value="{{old('representative_complement')}}">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="representative_complement">Complemento</label>
+                                            <input type="text" class="form-control w-50" name="representative_complement" 
+                                                id="representative_complement" value="{{old('representative_complement')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_neighborhood">Bairro</label>
-                                        <input type="text" class="form-control w-50" name="representative_neighborhood" 
-                                            id="representative_neighborhood" value="{{old('representative_neighborhood')}}">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="representative_neighborhood">Bairro</label>
+                                            <input type="text" class="form-control w-50" name="representative_neighborhood" 
+                                                id="representative_neighborhood" value="{{old('representative_neighborhood')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_city">Cidade</label>
-                                        <input type="text" class="form-control w-50" name="representative_city" 
-                                            id="representative_city" value="{{old('representative_city')}}">
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="representative_city">Cidade</label>
+                                            <input type="text" class="form-control w-50" name="representative_city" 
+                                                id="representative_city" value="{{old('representative_city')}}">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="representative_state">Estado</label>
-                                        <select name="representative_state" class="form-control w-25">
-                                            <option value=""></option>
-                                            @foreach ($states as $state)
-                                                <option {{old('representative_state')==$state?'selected':''}}
-                                                    value="{{$state}}">{{$state}}</option>
-                                            @endforeach
-                                        </select>
+                                        <div class="form-group">
+                                            <label for="representative_state">Estado</label>
+                                            <select name="representative_state" class="form-control w-25">
+                                                <option value=""></option>
+                                                @foreach ($states as $state)
+                                                    <option {{old('representative_state')==$state?'selected':''}}
+                                                        value="{{$state}}">{{$state}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

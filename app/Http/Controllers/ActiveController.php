@@ -544,6 +544,7 @@ class ActiveController extends Controller
                 $idProgramedPayment=$this->addProgramedPaymentParcel($data['idInternalAccount'],$data['idProvider'],$data['description']
                 ,$data['value'],1,1,$data['date_payment'],$data['value']);
                 $payNow=$request->input('payNow');
+                
                 if($payNow && $payNow==1){
                     return redirect()->route('seeProgramedPayment',['idProgramedPayment'=>$idProgramedPayment]);
                 }

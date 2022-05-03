@@ -107,12 +107,13 @@
               </div>
             </div>
             <div class="card" id="card-Cpf">
-              <div class="row">
+                <div class="row">
                     <div class="col-6">
                         <div class="card">
                             <div class="card-header">
                                 <h4><center>Informação Cliente</center></h4>
                             </div>
+                            <div class="card-body">
                               <div class="form-group">
                                 <label for="name">Nome</label>
                                 <input type="text" class="form-control w-75" name="name" value="{{old('name')}}">
@@ -173,8 +174,8 @@
                                 <label for="occupation">Profissão</label>
                                 <input type="text" class="form-control w-50" name="occupation" value="{{old('occupation')}}">
                               </div>
-                            
-                      </div>
+                          </div>
+                        </div>
                     </div>
 
                     <div class="col-6">

@@ -4,8 +4,15 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <div class="info__title">
-                Informações contato concluido
+            <div class="row">
+                <div class="col-6">
+                    <div class="info__title">
+                        Informações contato concluido
+                    </div>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <a class="btn btn-success backButton" href="{{route('seeSale',['idSale'=>$basic_contact_info->id_sale])}}">Ir para a venda</a>
+                </div>
             </div>
         </div>
 

@@ -113,48 +113,7 @@ $(()=>{
         })
     }
 
-    if($('#card_several').length > 0){
-        $('#btnSeveral').on('click',function(event){
-            event.preventDefault();
-            Swal.fire({
-                title: "Ao confirmar, as taxas desse contato vão ser consideradas pagas e o contato como resolvido. Deseja continuar?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                cancelButtonText:'Cancelar',
-                confirmButtonText: 'Sim',
-                customClass: 'mySweetalert',
-
-                }).then((result) => {
-                    if (result.value) {
-                        $('#severalContact').trigger('submit');
-                    }
-            })
-        })
-    }
-
     
-    if($('#card_several-solution').length > 0){
-        $('#btnSeveralSolution').on('click',function(event){
-            event.preventDefault();
-            Swal.fire({
-                title: "Ao confirmar, se as possiveis taxas foram pagas, o contato vai ficar como resolvido. Deseja continuar?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                cancelButtonText:'Cancelar',
-                confirmButtonText: 'Sim',
-                customClass: 'mySweetalert',
-
-                }).then((result) => {
-                    if (result.value) {
-                        $('#severalContactSolution').trigger('submit');
-                    }
-            })
-        })
-    }
 
    
     if($('#card_reissue').length > 0){

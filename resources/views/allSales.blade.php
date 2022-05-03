@@ -9,6 +9,29 @@
             @endif
             <div class="info__title info__title--without-margin-top">Vendas</div>
         </div>
+        <div class="card-header">
+            <form method="get" class="formOrder">
+                <input type="hidden" name="contract_number" value="{{$contract_number}}">
+                <input type="hidden" name="orderContract" value="{{$orderContract}}">
+                <input type="hidden" name="orderLot" value="{{$orderLot}}">
+                <input type="hidden" name="orderBlock" value="{{$orderBlock}}">
+                <input type="hidden" name="orderInterprise" value="{{$orderInterprise}}">
+                <input type="hidden" name="interprise_name" value="{{$interprise_name}}">
+                <input type="hidden" name="lot_number" value="{{$lot_number}}">
+                <input type="hidden" name="block"  value="{{$block}}">
+                <input type="hidden" name="date" value="{{$date}}">
+                <input type="hidden" name="client_name" value="{{$client_name}}">
+                <input type="hidden" name="type" value="{{$type}}">
+                
+                <div class="info__title">Ordenar por:</div><br>
+                <div class="form-group d-flex ml-2">
+                    <button class="btn m-1 btnOrderBy {{$orderContract == 0 ? 'btn-success':'btn-primary'}}" order="1">Contrato</button>
+                    <button class="btn m-1 btnOrderBy {{$orderLot == 0 ? 'btn-success':'btn-primary'}}" order="2">Lotes</button>
+                    <button class="btn m-1 btnOrderBy {{$orderBlock == 0 ? 'btn-success':'btn-primary'}}" order="3">Quadras</button>
+                    <button class="btn m-1 btnOrderBy {{$orderInterprise == 0 ? 'btn-success':'btn-primary'}}" order="4">Empreendimento</button>
+                </div>
+            </form>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
             <table class="table table-bordered table-hover dataTable dtr-inline">
@@ -87,7 +110,8 @@
                                 @if(Auth::user()->type==1)
 
                                     <a href="{{route('suspendSale',['idSale'=>$sale->id])}}" 
-                                        msg="Tem certeza que deseja suspender essa venda??"  
+                                        msg="Tem certeza que deseja deletar essa venda?
+                                            Tudo relacionado a essa venda será deletado"  
                                         class="btnActions btnDelete" title="suspender venda">
                                         x
                                     </a>
@@ -136,5 +160,5 @@
 @endsection
 
 @section('js')
-
+    <script src="{{asset('js/allSales.min.js')}}"></script>
 @endsection

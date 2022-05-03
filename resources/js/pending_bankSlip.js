@@ -1,6 +1,12 @@
 $(()=>{
     getBankSlipSelected();
 
+    $('#btnSelectAll').on('click',function(){
+        $('.checkBankSlip').each(function(){
+            $(this).prop('checked',true);
+        });
+    });
+
     $('.checkBankSlip').each(function(){
         $(this).on('change',function(){
             getBankSlipSelected();

@@ -31,6 +31,10 @@ $(()=>{
         });
     })
 
+    $('#startDate').on('input',function(e) {
+        $('#finalDate').val($(this).val());
+    });
+
     $('#btnSicredi').on('click',function(){
         $('#id_bank').val(1);
     })

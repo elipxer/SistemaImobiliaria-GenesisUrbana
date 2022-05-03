@@ -217,7 +217,8 @@ a:hover {
 }
 
 .uploadArea,.downloadArea{
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
     height: 400px;
     border: 1px dashed rgb(128, 127, 127);
     display: flex;

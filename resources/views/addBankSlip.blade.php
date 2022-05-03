@@ -71,6 +71,9 @@
                                 <input type="submit" style="display: none;">
                             </tr>
                         </form>
+                        @if(count($sales)==0)
+                        <h5 class="info__title">Digite o número do contrato:</h5>
+                        @endif
                     
                         @foreach ($sales as $key=>$sale)
                             <tr>

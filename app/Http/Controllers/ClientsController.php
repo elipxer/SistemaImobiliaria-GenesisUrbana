@@ -443,15 +443,15 @@ class ClientsController extends Controller
                 $clients->spouse_email=$dataClients['spouse_email'];
                 $clients->spouse_occupation=$dataClients['spouse_occupation'];
              }else{
-                $clients->spouse_name="";
-                $clients->spouse_birth_date="";
-                $clients->spouse_rg="";
-                $clients->spouse_emitting_organ="";
-                $clients->spouse_cpf="";
-                $clients->spouse_nationality="";
-                $clients->spouse_sex="";
-                $clients->spouse_email="";
-                $clients->spouse_occupation="";
+                $clients->spouse_name=null;
+                $clients->spouse_birth_date=null;
+                $clients->spouse_rg=null;
+                $clients->spouse_emitting_organ=null;
+                $clients->spouse_cpf=null;
+                $clients->spouse_nationality=null;
+                $clients->spouse_sex=null;
+                $clients->spouse_email=null;
+                $clients->spouse_occupation=null;
              }
              $clients->cep_payment_collection=$dataClients['cep_payment_collection'];
              $clients->city_payment_collection=$dataClients['city_payment_collection'];
@@ -531,14 +531,15 @@ class ClientsController extends Controller
     }
 
     private function getRestValue($idSale){
-        $data['parcels']=Parcels::where('id_sale',$idSale)->where('status',2)->orwhere('status',3)->get();
+        $data['parcels']=Parcels::where('id_sale',$idSale)->get()->except('status',1);;
+       
         $valuesParcels=[];
         foreach ($data['parcels'] as $key => $parcel) {
             $updated_value=floatVal(str_replace(['.',','],['','.'],$parcel->updated_value));
             $valuesParcels[]=$updated_value;
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
     private function getPaidValue($idSale){
@@ -550,7 +551,7 @@ class ClientsController extends Controller
             $valuesParcels[]=floatVal($updated_value);
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
     private function getLaterValue($idSale){
@@ -562,7 +563,7 @@ class ClientsController extends Controller
             $valuesParcels[]=floatVal($updated_value);
         }
         
-        return number_format(array_sum($valuesParcels),2);
+        return number_format(array_sum($valuesParcels),2,',','.');
     }
 
 
@@ -581,13 +582,15 @@ class ClientsController extends Controller
         $ruleRequiredCpfClient="";
         $ruleRequiredCnpjClient="";
         
-        if($data['kind_person']==2){
-            $ruleRequiredRepresentative="required";
-            $ruleRequiredCnpjClient="required";
-        
-        }else if($data['kind_person']==1){
-            $ruleRequiredNameClient='required';
-            $ruleRequiredCpfClient="required";
+        if($client == null){
+            if($data['kind_person']==2){
+                $ruleRequiredRepresentative="required";
+                $ruleRequiredCnpjClient="required";
+            
+            }else if($data['kind_person']==1){
+                $ruleRequiredNameClient='required';
+                $ruleRequiredCpfClient="required";
+            }
         }
         
         $ruleRequiredSpouse="";
@@ -608,13 +611,13 @@ class ClientsController extends Controller
             'sex'=>['int','nullable'],
             'email'=>['email',$ruleUnique,'max:450','nullable'],
             'occupation'=>['string','nullable'],
-            'cep'=>['string','nullable','regex:/([0-9]{5})\-([0-9]{3})/'],
-            'street'=>['string','nullable','max:450'],
-            'number'=>['int','nullable'],
+            'cep'=>['required','string','regex:/([0-9]{5})\-([0-9]{3})/'],
+            'street'=>['required','string','max:450'],
+            'number'=>['required','int','nullable'],
             'complement'=>['string','nullable','max:450'],
-            'neighborhood'=>['string','nullable','max:450'],
-            'city'=>['string','nullable','max:450'],
-            'state'=>['string','nullable','max:2'],
+            'neighborhood'=>['required','string','max:450'],
+            'city'=>['required','string','nullable','max:450'],
+            'state'=>['required','string','nullable','max:2'],
             'id_representative'=>$ruleRequiredRepresentative,
             
             'spouse_name'=>[$ruleRequiredSpouse,'string','nullable','max:450'],
@@ -664,17 +667,23 @@ class ClientsController extends Controller
             'occupation.string'=>'o campo profissão tem que ser string',
             'cep.string'=>'o campo cep tem que ser string',
             'cep:regex'=>'Cep inválido',
+            'cep.required'=>'o campo cep é obrigatório',
             'street.string'=>'o campo rua deve ser string',
             'street.max'=>'o campo rua deve ter no maximo 450 caracteres',
+            'street.required'=>'o campo rua é obrigatório',
             'number.string'=>'o campo numero deve ser inteiro',
+            'number.required'=>'o campo numero é obrigatório',
             'complement.string'=>'o campo complemento deve ser string',
             'complement.max'=>'o campo complemento deve ter no maximo 450 caracteres',
             'neighborhood.string'=>'o campo bairro deve ser string',
             'neighborhood.max'=>'o campo bairro deve ter no maximo 450 caracteres',
+            'neighborhood.required'=>'o campo bairro é obrigatório',
             'city.string'=>'o campo cidade deve ser string',
             'city.max'=>'o campo cidade deve ter no maximo 450 caracteres',   
+            'city.required'=>'o campo cidade é obrigatório',
             'state.string'=>'o campo estado cidade deve ser string',
             'state.max'=>'o campo estado deve ter no maximo 2 caracteres',   
+            'state.required'=>'o campo estado é obrigatório',
             
             'spouse_name.string'=>'o campo nome cônjuge tem que ser string',
             'spouse_name.required'=>'o campo nome cônjuge é obrigatório',

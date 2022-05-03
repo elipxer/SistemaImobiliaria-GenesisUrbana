@@ -192,7 +192,7 @@
                         <div class="info__title">Adicione algum arquivo:</div>
                     </div>
                     <div class="card-body">
-                        <div class="uploadArea">
+                        <div class="uploadArea w-100">
                             <div class="uploadArea__title">Clique ou arraste o arquivo</div>
                             <div class="uploadAreaDrop">
                                 <div class="uploadAreaDrop__img">
@@ -211,8 +211,8 @@
                             Usuario responsavel pelo contato:
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
+                    <div class="card-body overflow-hidden">
+                        <table class="table table-responsive table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
                             <thead class="table table-dark">
                             <tr role="row">
                                 <th class="sorting" tabindex="0"  rowspan="1" colspan="1"></th>

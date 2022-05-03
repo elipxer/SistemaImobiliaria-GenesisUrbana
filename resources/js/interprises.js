@@ -75,9 +75,9 @@ $(()=>{
         
         $('#card_porc').empty();
         companiesChoise.forEach(element => {
-            let linePorc=line.clone();
+            let linePorc=line.clone()[0];
             $(linePorc).css('display','flex');
-            let nameCpfCnpj="Nome: "+element.name+" Cpnj"+element.cnpj;
+            let nameCpfCnpj="Nome: "+element.name+" Cpnj: "+element.cnpj;
             $(linePorc).find('.nameCompany').html(nameCpfCnpj);
             $(linePorc).find('.idCompany').val(element.id);
             $('#card_porc').append(linePorc);

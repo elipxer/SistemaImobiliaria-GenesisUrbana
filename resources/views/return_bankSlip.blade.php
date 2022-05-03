@@ -38,8 +38,44 @@
             <div title="adicionar arquivo retorno" class="btnActions btnActions--middle" data-toggle="modal" 
             data-target="#modalAcoes" data-toggle="tooltip" id="btnAddReturnBankSlip">+</div>            
             <div class="info__title info__title--without-margin-top">Retornos</div>
-
         </div>
+
+        <div class="card-header">
+            <form class="row" method="get">
+                <input type="hidden" name="order">
+                <div class="col-6">
+                    <div class="form-group">
+                        <h5>Filtrar por:</h5>
+                        <div class="form-group d-flex mt-4">
+                            <div class="d-flex mr-3">
+                                <input class="mr-1" style="margin-top: 6px" type="radio" 
+                                    {{$order=="1"?'checked':''}} name="order" value="1">
+                                <label class='font-weight-bold'>Novo ao antigo</label> 
+                            </div>
+
+                            <div class="d-flex">
+                                <input class="mr-1" style="margin-top: 6px" type="radio" 
+                                {{$order=="2"?'checked':''}} name="order" value="2">
+                                <label class='font-weight-bold'>Antigo ao novo</label> 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Periodo</label>
+                        <div class="form-group d-flex">
+                            <input class="form-control" id="startDate" type="date" 
+                                name="startDate" value="{{$startDate!=""?$startDate:''}}">
+                            <input class="form-control" id="finalDate" type="date" 
+                                name="finalDate" value="{{$finalDate!=""?$finalDate:''}}">
+                            <input class="btn btn-success" type="submit" value="Filtrar">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6"></div>
+            </form>
+        </div>
+
         <div class="card-body">
             <table class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
                 <thead class="table table-dark">

@@ -54,22 +54,25 @@
 </form>
 
 @section('content')
+    <div class="info__title">Todas Parcelas</div>
+
     <div class="card">
         <div class="card-header">
             <div class="row">
-                <div class="col-3">
-                    <div class="info__title">Todas Parcelas</div>
+                <div class="col-0">
                 </div>
-                <div class="col-8">
+                <div class="col-12">
                     <div class="row">
-                        <div class="col-11">
-                            <form method="GET" class="w-100 d-flex justify-content-end">
+                        <div class="col-12 d-flex">
+                            <form method="GET" class="w-100 d-flex">
                                 <input type="hidden" value={{$contractCheck}} name="contractCheck">
                                 <input type="hidden" value={{$deadlineCheck}} name="deadlineCheck">
                                 <input type="hidden" value={{$paymentDateCheck}} name="paymentDateCheck">
-                                
+                                <input type="hidden" value={{$startDatePayment}} name="startDatePayment">
+                                <input type="hidden" value={{$finalDatePayment}} name="finalDatePayment">
+                               
                                 <div class="form-group" >
-                                    <label>Periodo</label><br>
+                                    <label>Periodo (Data Vencimento)</label><br>
                                     <div class="form-group" style="display:flex;">
                                         <input class="form-control" style="width: 40%" required value="{{$startDate}}" type="date" name="startDate">
                                         <input class="form-control" style="width: 40%" required value="{{$finalDate}}" type="date" name="finalDate">
@@ -77,17 +80,41 @@
                                     </div>
                                 </div>
                             </form>
-                        </div>
-                        <div class="col-1">
+
+                            <form method="GET" class="w-100 d-flex">
+                                <input type="hidden" value={{$contractCheck}} name="contractCheck">
+                                <input type="hidden" value={{$deadlineCheck}} name="deadlineCheck">
+                                <input type="hidden" value={{$paymentDateCheck}} name="paymentDateCheck">
+                                <input type="hidden" value={{$startDate}} name="startDate">
+                                <input type="hidden" value={{$finalDate}} name="finalDate">
+                                
+                                <div class="form-group" >
+                                    <label>Periodo (Data Pagamento)</label><br>
+                                    <div class="form-group" style="display:flex;">
+                                        <input class="form-control" style="width: 40%" required value="{{$startDatePayment}}" type="date" name="startDatePayment">
+                                        <input class="form-control" style="width: 40%" required value="{{$finalDatePayment}}" type="date" name="finalDatePayment">
+                                        <input class="btn btn-success" type="submit" value="Filtrar">
+                                    </div>
+                                </div>
+                            </form>
+                            
                             <form action="{{route('parcelsReport')}}" method="POST" target="_blank" style="margin-top: 22px;">
                                 @csrf
                                 <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
                                 <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
+                                <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
+                                <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
+                                <input class="form-control" value="{{$status}}" type="hidden" name="status">
+                                <input class="form-control" value="{{$contract_number}}" type="hidden" name="contract_number">
+
                                 <div class="form-group">
                                     <label></label><br>
                                     <input type="submit" class="btn btn-success" value="Gerar Relatorio">
                                 </div>
                             </form>
+                        </div>
+                        <div class="col-0">
+                            
                         </div>
                     </div>
                 </div>
@@ -95,11 +122,13 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <form class="d-flex" style="margin-top: 22px; 
+                <form class="d-flex w-100" style="margin-top: 22px; 
                     width:550px;height:50px; border-bottom:1px solid #ccc; padding-bottom:25px;">
                     
                     <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
                     <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
+                    <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
+                    <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
                     
                     <label style="line-height:50px; margin-right:10px; font-size:15px;">Ordenar por:</label>
                     <div class="form-group m-1 h-100" style="line-height:40px;">
@@ -145,6 +174,8 @@
                             <input type="hidden" value={{$contractCheck}} name="contractCheck">
                             <input type="hidden" value={{$deadlineCheck}} name="deadlineCheck">
                             <input type="hidden" value={{$paymentDateCheck}} name="paymentDateCheck">
+                            <input type="hidden" value={{$startDatePayment}} name="startDatePayment">
+                            <input type="hidden" value={{$finalDatePayment}} name="finalDatePayment">
                             <tr>
                                 <td></td>
                                 <td>
@@ -218,7 +249,13 @@
                                 <td style="min-width: 90px">{{$parcel->value}}</td>
                                 <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
                                 <td>{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
-                                <td style="min-width: 100px">{{!empty($parcel->pad_value)?$parcel->pad_value:'0,00'}}</td>
+                                <td style="min-width: 100px">
+                                    @if($parcel->send_bankSlip==0)
+                                        {{!empty($parcel->pad_value)?str_replace(['.','.'],['',','],$parcel->pad_value):'0,00'}}
+                                    @else
+                                        {{!empty($parcel->pad_value)?str_replace(['.','.'],[',',','],$parcel->pad_value):'0,00'}}
+                                    @endif
+                                </td>
                                 <td>{{!empty($parcel->pad_date)?date('d/m/Y',strtotime($parcel->pad_date)):'Não pago'}}</td>
                                 <td>
                                     @if($parcel['bankSlip'])
