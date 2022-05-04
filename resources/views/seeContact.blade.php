@@ -705,6 +705,9 @@
                             <input type="hidden" name="return_value" value="{{$cancel_contact_info->return_value}}">
                             <input type="hidden" name="number_parcels_return" value="{{$cancel_contact_info->number_parcels_return}}">
                             <input type="hidden" name="value_parcel_return" value="{{$cancel_contact_info->value_parcel_return}}">
+                            <input type="hidden" name="administrative_expenses" value="{{$cancel_contact_info->administrative_expenses}}">
+                            <input type="hidden" name="sale_commission_rate" value="{{$cancel_contact_info->sale_commission_rate}}">
+                            
                         @endif
                         <div class="card-body">
                             <div class="uploadArea">

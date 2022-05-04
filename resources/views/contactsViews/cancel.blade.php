@@ -62,19 +62,20 @@
                         <div class="form-group">
                             <label for="contract">Despesas administrativas*</label>
                             <input class="form-control w-50 money" type="text" 
-                                name="administrative_debits" id="administrative_debits" value="{{$administrative_expenses}}" readonly>
+                                name="administrative_debits" id="administrative_debits" 
+                                value="{{$administrative_expenses==0?'0,00':$administrative_expenses}}" readonly>
                         </div>
 
                         <div class="form-group">
                             <label for="contract">Especificação do debito*</label>
                             <input class="form-control w-50" type="text" 
-                                name="specification_debits">
+                                name="specification_debits" value="0,00">
                         </div>
 
                         <div class="form-group">
                             <label for="total_parcels_pad">Soma dos valores do financiamento (pago) *</label>
                             <input class="form-control w-25 money" type="text" 
-                            name="total_parcels_pad" value="{{$total_parcels_pad}}" id="total_parcels_pad" readonly>
+                            name="total_parcels_pad" value="{{$total_parcels_pad==0?'0,00':$total_parcels_pad}}" id="total_parcels_pad" readonly>
                         </div>
 
                         <div class="form-group">
@@ -196,8 +197,7 @@
                             <div class="col-3">
                                 <div class="form-group">
                                     <label for="fine_contact">Valor a restituir</label>
-                                    <input class="form-control money" type="text" name="return_value" id="return_value"
-                                        value="return_value">
+                                    <input class="form-control money" type="text" name="return_value" id="return_value" value="0,00">
                                 </div>
                             </div>
                             
@@ -205,7 +205,7 @@
                                 <div class="form-group">
                                     <label for="number_parcels_return">Primeira parcela</label>
                                     <input class="form-control" type="date" id="deadline" name="first_parcel_return" 
-                                        value="{{$first_parcel}}" readonly>
+                                        value="{{$first_parcel}}" readonly >
                                 </div>
                             </div>
                             
@@ -213,7 +213,7 @@
                                 <div class="form-group">
                                     <label for="value_parcel_return">Mensalidade</label>
                                     <input class="form-control money" type="text" name="value_parcel_return" 
-                                        value="" id="value_parcel_return" readonly>
+                                        value="0,00" id="value_parcel_return" readonly>
                                 </div>
                             </div>
 

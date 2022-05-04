@@ -206,7 +206,10 @@ class ContactController extends Controller
             $input_value=floatVal(str_replace(['.',','],['','.'],$sale->input));
             $data['total_parcels_pad']=str_replace('.',',',$total_parcels_pad);
             $data['administrative_expenses']=str_replace('.',',',number_format($total_parcels_pad*10/100,2));
-            
+            if($total_parcels_pad==0){
+                $data['total_parcels_pad']=0;
+                $data['administrative_expenses']=0;
+            }
             $deadline=date('Y-m')."-26";
             $data['first_parcel']=date('Y-m-d',strtotime('+1 month',strtotime($deadline)));
             
@@ -798,9 +801,7 @@ class ContactController extends Controller
         return redirect()->route('seeSale',['idSale'=>$dataContact['idSale']]);
     }
 
-   
-
-    public function addReissueContact(Request $request){
+   public function addReissueContact(Request $request){
         $dataContact=$request->only(['id_sale','id_user','expired_day','cancel_payment_slip','contact_client_name',
             'where','deadline','subject_matter','contactFile','parcel_late_sum','rate_reissue','deadline_reissue'
             ,'total_reissue','parcels_selected']);
