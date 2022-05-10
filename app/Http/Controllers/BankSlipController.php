@@ -738,6 +738,9 @@ class BankSlipController extends Controller
             $totalReadjustRate=$this->getSumReadjustRate($index_value_date_anniversary,$index_value_date_final,$index);
             if($totalReadjustRate>0){
                 $totalReadjustRate=$totalReadjustRate+$sale->annual_rate;
+                if($totalReadjustRate < $sale->minimum_variation){
+                    $totalReadjustRate=$sale->minimum_variation;
+                }
             }
             
             if($totalReadjustRate>0){

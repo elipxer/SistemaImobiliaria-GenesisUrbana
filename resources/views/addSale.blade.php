@@ -166,6 +166,12 @@
                                 <input class="form-control w-25" type="number" name="annual_rate" 
                                         value="6">
                             </div>
+
+                            <div class="form-group">
+                                <label for="contract">Variação Minima*</label>
+                                <input class="form-control w-25" type="number" name="minimum_variation" 
+                                        value="10">
+                            </div>
                         </div>
                     </div>
 

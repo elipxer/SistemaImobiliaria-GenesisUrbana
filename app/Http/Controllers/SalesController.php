@@ -265,10 +265,10 @@ class SalesController extends Controller
 
 
         $dataSale=$request->only(['id_interprise','id_lot','id_clients','client_payment_id','id_clients_porc','contract_number','value','expiration_day',
-            'index','input','descont','first_parcel','parcels','type','value_parcel','contractFile','annual_rate']);
+            'index','input','descont','first_parcel','parcels','type','value_parcel','contractFile','annual_rate','minimum_variation']);
         
         if($request->hasAny(['id_interprise','id_lot','id_clients','client_payment_id','id_clients_porc','contract_number','value','expiration_day',
-            'index','input','descont','first_parcel','parcels','type','value_parcel','contractFile','annual_rate'])){
+            'index','input','descont','first_parcel','parcels','type','value_parcel','contractFile','annual_rate','minimum_variation'])){
             
             $this->validator($dataSale);
             $sale=new Sales();   
@@ -289,6 +289,7 @@ class SalesController extends Controller
             $sale->first_parcel=$dataSale['first_parcel'];
             $sale->parcels=$dataSale['parcels'];
             $sale->annual_rate=$dataSale['annual_rate'];
+            $sale->minimum_variation=$dataSale['minimum_variation'];
             $sale->propose_date=date('Y-m-d');
             $sale->type=1;
             $sale->save();
@@ -693,13 +694,16 @@ class SalesController extends Controller
     }
 
     public function updateSale(Request $request){
-        $dataSale=$request->only(['idSale','propose_date']);
+        $dataSale=$request->only(['idSale','propose_date','minimum_variation']);
         
         $idSale=$dataSale['idSale'];
-        $proposeDate=$dataSale['propose_date'];
-    
         $sale=Sales::where('id',$idSale)->first();
+
+        $proposeDate=$request->filled('propose_date')?$dataSale['propose_date']:$sale->propose_date;
+        $minimum_variation=$request->filled('minimum_variation')?$dataSale['minimum_variation']:0;
+    
         $sale->propose_date=$proposeDate;
+        $sale->minimum_variation=$minimum_variation;
         $sale->save();
 
         return redirect()->route('seeSale',['idSale'=>$idSale]);
@@ -849,6 +853,9 @@ class SalesController extends Controller
             $totalReadjustRate=$this->getSumReadjustRate($index_value_date_anniversary,$index_value_date_final,$index);
             if($totalReadjustRate>0){
                 $totalReadjustRate=$totalReadjustRate+$sale->annual_rate;
+                if($totalReadjustRate < $sale->minimum_variation){
+                    $totalReadjustRate=$sale->minimum_variation;
+                }
             }
             
             if($totalReadjustRate>0){
@@ -1223,6 +1230,7 @@ class SalesController extends Controller
             'first_parcel'=>['date','nullable'],
             'parcels'=>['required','int','nullable'],
             'annual_rate'=>['required','nullable'],
+            'minimum_variation'=>['required','nullable'],
             'value_parcel'=>['required','max:20','regex:/^([0-9\.\,]{1,})$/','nullable'],
         ],$this->msgSale())->validate();
     }
@@ -1250,7 +1258,7 @@ class SalesController extends Controller
             'value_parcel.max'=>'o valor da parcela tem que ter no maximo 20 caracteres',
             'value_parcel.regex'=>'o valor da parcela está inválido',
             'annual_rate.required'=>'A taxa anual é obrigatória',
-            'annual_rate.int'=>'A taxa anual tem que ser inteiro',
+            'minimum_variation.required'=>'A variação minima é obrigatória',
         ];
     }
 }

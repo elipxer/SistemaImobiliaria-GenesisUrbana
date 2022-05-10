@@ -280,6 +280,24 @@
                             {{$sale->annual_rate}}%
                         </div>
                     </div><br>
+
+                    <div class="input-info__group">
+                        <div class="input-info__title">Variação Minima</div>
+                        @if(Auth::user()->type!=1)
+                        <div class="input__info">
+                           {{$sale->minimum_variation}} 
+                        </div>
+                        @endif
+                        @if(Auth::user()->type==1)
+                            <form method="POST" action="{{route('updateSale')}}" class="input-info__group" action="{}">
+                                @csrf
+                                <div class="input__info">
+                                    <input type="hidden" name="idSale" value="{{$sale->id}}">
+                                    <input type="number" name="minimum_variation" class="form-control" value="{{$sale->minimum_variation}}">  
+                                </div>
+                                <input type="submit" class="btn btn-info" value="Salvar"/>
+                            </form>
+                        @endif
                 </div>
             </div>
         </div>
