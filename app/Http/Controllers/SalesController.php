@@ -834,6 +834,44 @@ class SalesController extends Controller
                 $this->getDatesParcel_Readjust($parcel);
             }
         }
+
+        /*Correção dos contratos */
+
+        /*if($idSale==26 || $idSale==23 || $idSale==22 || $idSale==24){
+            $parcelsFix=Parcels::where('id_sale',$idSale)->where('num','>',24)->get();
+            $firstParcelValue=Parcels::where('id_sale',$idSale)->where('num',12)->first()->value;
+            
+            foreach ($parcelsFix as $key => $parcel) {
+                $parcel=Parcels::where('id',$parcel['id'])->first();
+                $parcel->value=$firstParcelValue;
+                $parcel->updated_value=$firstParcelValue;
+                $parcel->reajust="";
+                $parcel->save();
+            }
+
+            $parcelsFix=Parcels::where('id_sale',$idSale)->where('num','>=',13)->where('num','<=',24)->get();
+            foreach ($parcelsFix as $key => $parcel) {
+                $parcel=Parcels::where('id',$parcel['id'])->first();
+                $parcel->send_bankSlip=0;
+                $parcel->save();
+            }
+
+            $parcel=Parcels::where('id_sale',$idSale)->where('num',12)->first();
+            if($parcel != null){
+                $numParcel=$parcel->num;
+                $numberTimeReadjust=$numberParcelTotal/12; 
+                $allNumberParcelReadjust=[];
+                for ($i=0,$numberParcelReadjust=0; $i < $numberTimeReadjust; $i++) { 
+                    $numberParcelReadjust=$numberParcelReadjust+12;    
+                    $allNumberParcelReadjust[]=$numberParcelReadjust;
+                }
+    
+                if(in_array($numParcel,$allNumberParcelReadjust)){
+                    $this->getDatesParcel_Readjust($parcel);
+                }
+            }
+        }*/
+
     }
 
     private function getDatesParcel_Readjust($parcelObject){
@@ -940,7 +978,7 @@ class SalesController extends Controller
 
         $valueReadjust=$parcelValue*$sumReadjust/100;
         $totalValueReadjust=$parcelValue+$valueReadjust;
-        $parcelsReadjust=Parcels::where('num','>=',$numParcel+1)->where('num','<=',$numParcel+($numParcel+11))
+        $parcelsReadjust=Parcels::where('num','>=',$numParcel+1)->where('num','<=',$numParcel+12)
         ->where('id_sale',$parcelObject->id_sale)->get();
         
         foreach ($parcelsReadjust as $key => $parcelItem) {

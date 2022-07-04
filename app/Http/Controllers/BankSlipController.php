@@ -704,32 +704,34 @@ class BankSlipController extends Controller
         
         $parcel=Parcels::where('id_sale',$idSale)->whereraw('MONTH(date) = MONTH(CURRENT_DATE())')
             ->whereraw('YEAR(date) = YEAR(CURRENT_DATE())')->first();
+        
+        $parcel=Parcels::where('id_sale',$idSale)->where('num',12)->first();
+        
         if($parcel != null){
             $numParcel=$parcel->num;
             $numberTimeReadjust=$numberParcelTotal/12; 
             $allNumberParcelReadjust=[];
-            for ($i=0,$numberParcelReadjust=1; $i < $numberTimeReadjust; $i++) { 
+            for ($i=0,$numberParcelReadjust=0; $i < $numberTimeReadjust; $i++) { 
                 $numberParcelReadjust=$numberParcelReadjust+12;    
                 $allNumberParcelReadjust[]=$numberParcelReadjust;
             }
 
             if(in_array($numParcel,$allNumberParcelReadjust)){
+                echo "AAAAAA";
                 $this->getDatesParcel_Readjust($parcel);
             }
         }
     }
 
     private function getDatesParcel_Readjust($parcelObject){
-        $anniversaryDate=date('Y-m-d',strtotime('-13 month',strtotime($parcelObject->date)));
+        $anniversaryDate=date('Y-m-d',strtotime('-12 month',strtotime($parcelObject->date)));
         $dateIndexValueAnniversary=date('Y',strtotime($anniversaryDate)).'-'
             .date('m',strtotime($anniversaryDate)).'-01';
-
         $sale=Sales::where('id',$parcelObject->id_sale)->first();    
         $index=$sale->index;
         
         $index_value_object=DB::table('index_value')->where('month',$dateIndexValueAnniversary)
             ->where('idIndex',$index)->first();
-        
 
         if($index_value_object!=null){
             $index_value_date_anniversary=$index_value_object->month;
@@ -768,6 +770,7 @@ class BankSlipController extends Controller
         }
     }
 
+
     private function changeStatusParcelToReadjust($parcelObject){
         $parcelsReadjust=Parcels::where('num','>=',$parcelObject->num+1)
         ->where('num','<=',$parcelObject->num+11)
@@ -784,7 +787,7 @@ class BankSlipController extends Controller
             ->where('month','<=',$index_value_date_final)->orderBy('month','asc')->get();
         $dateIndexMonth=[];
         $dateIndexMonth[]=$index_value_date_anniversary;
-        for ($i=1; $i <=12; $i++) { 
+        for ($i=1; $i <=11; $i++) { 
             $date=date('Y-m-d',strtotime('+'.$i.'month',strtotime($index_value_date_anniversary)));
             $dateIndexMonth[]=$date;
         }
@@ -820,19 +823,19 @@ class BankSlipController extends Controller
 
     private function readjustParcels($parcelObject,$sumReadjust){
         $numParcel=$parcelObject->num;
-        $parcelValue=str_replace(['.',','],['','.'],$parcelObject->value); 
+        $parcelValue=Parcels::where('num',$numParcel)->where('id_sale',$parcelObject->id_sale)->first()->value;
+        $parcelValue=floatVal(str_replace(['.',','],['','.'],$parcelValue)); 
 
-        $parcelValue=floatVal($parcelValue);
         $valueReadjust=$parcelValue*$sumReadjust/100;
         $totalValueReadjust=$parcelValue+$valueReadjust;
-        $parcelsReadjust=Parcels::where('num','>=',$numParcel+1)->where('num','<=',$numParcel+($numParcel+11))
+        $parcelsReadjust=Parcels::where('num','>=',$numParcel+1)->where('num','<=',$numParcel+12)
         ->where('id_sale',$parcelObject->id_sale)->get();
         
         foreach ($parcelsReadjust as $key => $parcelItem) {
             $parcel=Parcels::where('id',$parcelItem->id)->first();
-            $parcel->value=str_replace('.',',',number_format($totalValueReadjust,2));
+            $parcel->value=number_format($totalValueReadjust,2,",",".");
             $parcel->reajust=number_format($valueReadjust,2)." (".$sumReadjust."%)";
-            $parcel->updated_value=number_format($totalValueReadjust,2);
+            $parcel->updated_value=number_format($totalValueReadjust,2,",",".");
             $parcel->status=2;
             $parcel->save();
         }
