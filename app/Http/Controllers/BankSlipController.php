@@ -705,8 +705,6 @@ class BankSlipController extends Controller
         $parcel=Parcels::where('id_sale',$idSale)->whereraw('MONTH(date) = MONTH(CURRENT_DATE())')
             ->whereraw('YEAR(date) = YEAR(CURRENT_DATE())')->first();
         
-        $parcel=Parcels::where('id_sale',$idSale)->where('num',12)->first();
-        
         if($parcel != null){
             $numParcel=$parcel->num;
             $numberTimeReadjust=$numberParcelTotal/12; 
@@ -717,7 +715,6 @@ class BankSlipController extends Controller
             }
 
             if(in_array($numParcel,$allNumberParcelReadjust)){
-                echo "AAAAAA";
                 $this->getDatesParcel_Readjust($parcel);
             }
         }
@@ -775,6 +772,7 @@ class BankSlipController extends Controller
         $parcelsReadjust=Parcels::where('num','>=',$parcelObject->num+1)
         ->where('num','<=',$parcelObject->num+11)
         ->where('id_sale',$parcelObject->id_sale)->get();
+        
         foreach ($parcelsReadjust as $key => $parcelVal) {
             $parcelVal=Parcels::where('id',$parcelVal->id)->first();
             $parcelVal->status=4;

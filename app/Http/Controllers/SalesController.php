@@ -690,20 +690,26 @@ class SalesController extends Controller
             }    
         }
 
+        $data['index']=DB::table('index')->get();
+
         return view('seeSale',$data);
     }
 
     public function updateSale(Request $request){
-        $dataSale=$request->only(['idSale','propose_date','minimum_variation']);
+        $dataSale=$request->only(['idSale','propose_date','minimum_variation','annual_rate','index']);
         
         $idSale=$dataSale['idSale'];
         $sale=Sales::where('id',$idSale)->first();
 
         $proposeDate=$request->filled('propose_date')?$dataSale['propose_date']:$sale->propose_date;
         $minimum_variation=$request->filled('minimum_variation')?$dataSale['minimum_variation']:0;
-    
+        $annual_rate=$request->filled('annual_rate')?$dataSale['annual_rate']:$sale->annual_rate;
+        $index=$request->filled('index')?$dataSale['index']:$sale->index;
+
         $sale->propose_date=$proposeDate;
         $sale->minimum_variation=$minimum_variation;
+        $sale->annual_rate=$annual_rate;
+        $sale->index=$index;
         $sale->save();
 
         return redirect()->route('seeSale',['idSale'=>$idSale]);
@@ -825,6 +831,7 @@ class SalesController extends Controller
             $numParcel=$parcel->num;
             $numberTimeReadjust=$numberParcelTotal/12; 
             $allNumberParcelReadjust=[];
+            
             for ($i=0,$numberParcelReadjust=0; $i < $numberTimeReadjust; $i++) { 
                 $numberParcelReadjust=$numberParcelReadjust+12;    
                 $allNumberParcelReadjust[]=$numberParcelReadjust;
@@ -837,38 +844,13 @@ class SalesController extends Controller
 
         /*Correção dos contratos */
 
-        /*if($idSale==26 || $idSale==23 || $idSale==22 || $idSale==24){
-            $parcelsFix=Parcels::where('id_sale',$idSale)->where('num','>',24)->get();
-            $firstParcelValue=Parcels::where('id_sale',$idSale)->where('num',12)->first()->value;
-            
-            foreach ($parcelsFix as $key => $parcel) {
-                $parcel=Parcels::where('id',$parcel['id'])->first();
-                $parcel->value=$firstParcelValue;
-                $parcel->updated_value=$firstParcelValue;
-                $parcel->reajust="";
-                $parcel->save();
-            }
-
+        /*if($idSale==26){
             $parcelsFix=Parcels::where('id_sale',$idSale)->where('num','>=',13)->where('num','<=',24)->get();
             foreach ($parcelsFix as $key => $parcel) {
                 $parcel=Parcels::where('id',$parcel['id'])->first();
                 $parcel->send_bankSlip=0;
+                $parcel->our_number=$this->createOurNumber($parcel['date']);
                 $parcel->save();
-            }
-
-            $parcel=Parcels::where('id_sale',$idSale)->where('num',12)->first();
-            if($parcel != null){
-                $numParcel=$parcel->num;
-                $numberTimeReadjust=$numberParcelTotal/12; 
-                $allNumberParcelReadjust=[];
-                for ($i=0,$numberParcelReadjust=0; $i < $numberTimeReadjust; $i++) { 
-                    $numberParcelReadjust=$numberParcelReadjust+12;    
-                    $allNumberParcelReadjust[]=$numberParcelReadjust;
-                }
-    
-                if(in_array($numParcel,$allNumberParcelReadjust)){
-                    $this->getDatesParcel_Readjust($parcel);
-                }
             }
         }*/
 

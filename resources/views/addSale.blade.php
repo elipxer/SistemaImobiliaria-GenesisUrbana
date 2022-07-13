@@ -12,8 +12,8 @@
                         <a href="{{route('allSales')}}" class="btn btn-success backButton">Voltar</a>
                     </div>
                 </div>
-                
             </div>
+            
             <div class="card-body">
                 <table class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
                     <thead class="table table-dark">

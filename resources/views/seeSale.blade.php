@@ -139,9 +139,28 @@
 
                     <div class="input-info__group">
                         <div class="input-info__title">Indice</div>
+                        @if(Auth::user()->type!=1)
                         <div class="input__info">
-                            {{$sale->index}}
+                            @foreach ($index as $indexItem)
+                                @if($sale->index==$indexItem->id)
+                                    {{$indexItem->name}}
+                                @endif
+                            @endforeach
                         </div>
+                        @endif
+                        
+                        @if(Auth::user()->type==1)
+                            <form method="POST" action="{{route('updateSale')}}" class="input-info__group" action="{}">
+                                @csrf
+                                <input type="hidden" name="idSale" value="{{$sale->id}}">
+                                <select class="form-control w-75 input__info" name="index">
+                                    @foreach ($index as $indexItem)
+                                        <option {{$sale->index==$indexItem->id?'selected':''}} value="{{$indexItem->id}}">{{$indexItem->name}}</option>
+                                    @endforeach
+                                </select>
+                                <input type="submit" class="btn btn-info" value="Salvar"/>
+                            </form>
+                        @endif
                     </div><br>
 
                     <div class="input-info__group">
@@ -255,6 +274,7 @@
                             {{date('d/m/Y',strtotime($sale->propose_date))}}
                         </div>
                         @endif
+
                         @if(Auth::user()->type==1)
                             <form method="POST" action="{{route('updateSale')}}" class="input-info__group" action="{}">
                                 @csrf
@@ -276,9 +296,22 @@
 
                     <div class="input-info__group">
                         <div class="input-info__title">Juros por ano</div>
-                        <div class="input__info">
-                            {{$sale->annual_rate}}%
-                        </div>
+                        @if(Auth::user()->type==1)
+                            <form method="POST" action="{{route('updateSale')}}" class="input-info__group" action="{}">
+                                @csrf
+                                <div class="input__info">
+                                    <input type="hidden" name="idSale" value="{{$sale->id}}">
+                                    <input type="number" name="annual_rate" class="form-control" value="{{$sale->annual_rate}}"> 
+                                </div>
+                                <input type="submit" class="btn btn-info" value="Salvar"/>
+                            </form>
+                        @endif
+
+                        @if(Auth::user()->type!=1)
+                            <div class="input__info">
+                                {{$sale->annual_rate}}%
+                            </div>
+                        @endif
                     </div><br>
 
                     <div class="input-info__group">
