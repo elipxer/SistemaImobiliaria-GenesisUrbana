@@ -428,6 +428,7 @@ class SalesController extends Controller
         $yearFirstParcel=$firstParcelDateDivide[0];
         $monthFirstParcel=$firstParcelDateDivide[1];
         $numberYearsParcel=1;
+        
         if($numberParcels>=12){
             $numberYearsParcel=ceil($numberParcels/12);
         }
@@ -841,19 +842,6 @@ class SalesController extends Controller
                 $this->getDatesParcel_Readjust($parcel);
             }
         }
-
-        /*Correção dos contratos */
-
-        /*if($idSale==26){
-            $parcelsFix=Parcels::where('id_sale',$idSale)->where('num','>=',13)->where('num','<=',24)->get();
-            foreach ($parcelsFix as $key => $parcel) {
-                $parcel=Parcels::where('id',$parcel['id'])->first();
-                $parcel->send_bankSlip=0;
-                $parcel->our_number=$this->createOurNumber($parcel['date']);
-                $parcel->save();
-            }
-        }*/
-
     }
 
     private function getDatesParcel_Readjust($parcelObject){

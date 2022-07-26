@@ -121,7 +121,6 @@ class ContactController extends Controller
             $data['index']=DB::table('index')->get();
             //Verifica qual foi a ultima parcela a ser reajustada
             $lastParcelReajust=$this->getLastReajustValue($idSale);
-           
             $data['refinancing_failed']=true;
             $firstParcelNotPad=Parcels::where('id_sale',$idSale)->where('status',"!=",1)->first();
             if($lastParcelReajust==null){
@@ -187,6 +186,7 @@ class ContactController extends Controller
                 ->where('id_sale',$idSale)
                 ->get(['notification_index_value.*','sales.id as idSale','sales.contract_number as contractNumber']);;
             } 
+            
             return view('contactsViews.refinancing',$data);
             
         
@@ -423,18 +423,24 @@ class ContactController extends Controller
     }
 
     private function getLastReajustValue($idSale){
-        $lastParcelReajus="";
+        $lastParcelReajust="";
         $parcels=Parcels::where('id_sale',$idSale)->where('type',1)->get();
-        $first_parcel_num=Parcels::where('id_sale',$idSale)->where('status','!=',1)
-            ->where('type',1)->first();
-        for ($i=$first_parcel_num->num; $i <count($parcels) ; $i=$i+12) { 
-            $parcelCompare=Parcels::where('id_sale',$idSale)->where('num','=',$i)->first();
-            if($parcelCompare->reajust != ""){
-                $lastParcelReajus=$parcelCompare;  
+       
+        $parcelNow=Parcels::where('id_sale',$idSale)->whereraw('MONTH(date) = MONTH(CURRENT_DATE())')
+        ->whereraw('YEAR(date) = YEAR(CURRENT_DATE())')->first();
+
+        if($parcelNow->num >= 13){
+            for ($i=13; $i <count($parcels) ; $i=$i+12) { 
+                $parcelCompare=Parcels::where('id_sale',$idSale)->where('num','=',$i)->first();
+                if($parcelNow->num>=$i && $parcelNow->num <= $i+12){
+                    if($parcelCompare->reajust != ""){
+                        $lastParcelReajust=$parcelCompare;  
+                    }
+                }
             }
         }
 
-        return $lastParcelReajus;
+        return $lastParcelReajust;
     }
 
     public function addSeveralContact(Request $request){
