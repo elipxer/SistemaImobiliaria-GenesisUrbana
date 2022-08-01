@@ -34,7 +34,9 @@ class ContactController extends Controller
         $data=[];
         $data['contacts']=ContactSale::join('sales','contact_sale.id_sale','=','sales.id')
             ->where('id_user',Auth::user()->id)
-            ->where('status',2)->get(['contact_sale.*','sales.contract_number as contractNumber']);
+            ->where('status',2)
+            ->orderBy('register_date','DESC')
+            ->get(['contact_sale.*','sales.contract_number as contractNumber']);
         $data['where']="";
         $data['subject_matter']="";
         $data['type']="";
@@ -59,7 +61,8 @@ class ContactController extends Controller
                 }
             }
             
-            $data['contacts']=$query->where('id_user',Auth::user()->id)->get();
+            $data['contacts']=$query->where('id_user',Auth::user()->id)
+            ->orderBy('register_date','DESC')->get();
             $data['where']=$dataContactLike['where'];
             $data['subject_matter']=$dataContactLike['subject_matter'];
             $data['type']=$dataContactEquals['type'];
