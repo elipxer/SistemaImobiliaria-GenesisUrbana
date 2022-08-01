@@ -825,9 +825,9 @@ class SalesController extends Controller
 
     private function verifyReajustParcels($idSale){
         $numberParcelTotal=count(Parcels::where('id_sale',$idSale)->get());
-        
         $parcel=Parcels::where('id_sale',$idSale)->whereraw('MONTH(date) = MONTH(CURRENT_DATE())')
             ->whereraw('YEAR(date) = YEAR(CURRENT_DATE())')->first();
+        
         if($parcel != null){
             $numParcel=$parcel->num;
             $numberTimeReadjust=$numberParcelTotal/12; 
@@ -930,6 +930,7 @@ class SalesController extends Controller
         $allIndex_value_readjust=DB::table('index_value')->where('idIndex',$idIndex)->where('month','>=',$index_date_anniversary)
             ->where('month','<=',$index_date_final)->orderBy('month','asc')->get();
         $rate_readjust_sum=0;
+        
         if(count($allIndex_value_readjust)==12){
             $index_values=[];    
             foreach ($allIndex_value_readjust as $key => $index_value) {

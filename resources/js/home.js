@@ -34,8 +34,16 @@ $(()=>{
         for (const key in allIndexEmpty) {
             let lineTable=$(tableIndexLine).clone();
             $(lineTable).css('display','table-row');
-            $(lineTable).find('td').eq(1).find('input').val(allIndexEmpty[key]);
+            $(lineTable).find('td').eq(1).find('input').val(convertDate(allIndexEmpty[key]));
             $('#tableIndexEmpty').find('tbody').append(lineTable);
         }
+    }
+
+    function convertDate(date){
+        var datePart = date.match(/\d+/g),
+        year = datePart[0].substring(2), // get only two digits
+        month = datePart[1], day = datePart[2];
+      
+        return day+'/'+month+'/'+year;
     }
 })

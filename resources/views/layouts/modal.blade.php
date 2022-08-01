@@ -1,4 +1,4 @@
-<div class="modal" id="modalAcoes">
+<div class="modal" id="modalAcoes" style="z-index:40000000 ;">
     <div class="modal-dialog">
         <div class="modal-content">
 
