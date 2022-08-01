@@ -606,13 +606,17 @@ class SalesController extends Controller
         if(Auth::user()->type == 6){
             
             $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
-                        ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)->orderBy('status','DESC')
+                        ->where('id_sale',$idSale)
+                        ->where('id_user',Auth::user()->id)
+                        ->orderBy('contact_sale.register_date','DESC')
+                        ->orderBy('contact_sale.status','DESC')
                         ->get(['contact_sale.*','users.name as user_name']);
             
             if($request->filled('justResolved')){
                 $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
                 ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)
                 ->where('contact.sales.status','!=',1)
+                ->orderBy('contact_sale.register_date','DESC')
                 ->orderBy('contact.sales.status','DESC')
                 ->get(['contact_sale.*','users.name as user_name']);
 
@@ -625,17 +629,22 @@ class SalesController extends Controller
             }            
          }else if(Auth::user()->type!=6){
             $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
-                    ->where('id_sale',$idSale)->orderBy('status','DESC')
+                    ->where('id_sale',$idSale)
+                    ->orderBy('contact_sale.register_date','DESC')
+                    ->orderBy('status','DESC')
                     ->get(['contact_sale.*','users.name as user_name']);
             
             if($request->filled('justResolved')){
                 $data['contact']=ContactSale::join('users','contact_sale.id_user','users.id')
                 ->where('id_sale',$idSale)->where('id_user',Auth::user()->id)
-                ->where('contact_sale.status','!=',1)->orderBy('contact_sale.status','DESC')
+                ->where('contact_sale.status','!=',1)
+                ->orderBy('contact_sale.register_date','DESC')
+                ->orderBy('contact_sale.status','DESC')
                 ->get(['contact_sale.*','users.name as user_name']);
 
                 $data['justResolved']=true;
-            }        
+            }    
+    
          }
         
         if($data['sale']->type==3){
