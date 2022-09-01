@@ -96,12 +96,10 @@
         <tr class="tabelaCabecalho">
             <th>Contrato</th>
             <th>Numero</th>
-            <th>Nosso Numero</th>
+            <th>Empreendimento</th>
             <th>Tipo</th>
             <th>Vencimento</th>
             <th>Valor</th>
-            <th>Acrescimo</th>
-            <th>Atualizado</th>
             <th>Valor Pago</th>
             <th>Data Pagamento</th>
             <th>Status</th>
@@ -110,7 +108,7 @@
             <tr class="tabelaLinha">
                 <td>{{$parcel->contract_number}}</td>
                 <td style="width: 50px">{{$parcel->num."/".$parcel->totalParcels}}</td>
-                <td style="min-width: 150px">{{$parcel->our_number}}</td>
+                <td>{{$parcel->interprise_name}}</td>
                 <td>
                     @if ($parcel->type==1)
                         Financiamento - {{$parcel->prefix}}
@@ -124,8 +122,6 @@
                 </td>
                 <td>{{date('d/m/Y',strtotime($parcel->date))}}</td>
                 <td style="min-width: 90px">{{$parcel->value}}</td>
-                <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
-                <td>{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
                 <td style="min-width: 100px">{{!empty($parcel->pad_value)?$parcel->pad_value:'0,00'}}</td>
                 <td>{{!empty($parcel->pad_date)?date('d/m/Y',strtotime($parcel->pad_date)):'Não pago'}}</td>
                 <td style="min-width: 125px;">

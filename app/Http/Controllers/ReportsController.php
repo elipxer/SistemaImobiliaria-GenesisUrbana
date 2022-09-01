@@ -486,8 +486,9 @@ class ReportsController extends Controller
     public function parcelsReport(Request $request){
         $data['parcels']=Parcels::where('status',"!=",1)
         ->join('sales','parcels.id_sale','=','sales.id')
+        ->join('interprises','sales.id_interprise','interprises.id')
         ->orderBy('date','ASC')
-        ->get(['parcels.*','sales.parcels as totalParcels',
+        ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
             'sales.contract_number as contract_number','sales.id as idSale']);        
     
         $dataFilterDate=$request->only(['startDate','finalDate']);
@@ -498,14 +499,15 @@ class ReportsController extends Controller
         if($request->hasAny(['startDate','finalDate','startDatePayment','finalDatePayment'])){
             $parcel=Parcels::query();
             $parcel->join('sales','parcels.id_sale','=','sales.id');
-            $parcel->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
+            $parcel->join('interprises','sales.id_interprise','interprises.id');
+            $parcel->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
 
             if($request->anyFilled(['startDatePayment','finalDatePayment'])){
                 $dataFilterDate=$request->only(['startDate','finalDate','startDatePayment','finalDatePayment']);
-                $parcel->whereBetween('pad_date', [$dataFilterDate['startDatePayment'], $dataFilterDate['finalDatePayment']]);
+                $parcel->whereBetween('parcels.pad_date', [$dataFilterDate['startDatePayment'], $dataFilterDate['finalDatePayment']]);
             }
 
-            if($request->filled('status')){
+            if($request->filled('status') && $request->input('status') != 0){
                 $status=$request->input('status');
                 $parcel->where('status',$status);
             }
@@ -517,7 +519,7 @@ class ReportsController extends Controller
 
         
             $data['parcels']=$parcel->orderBy('date','ASC')
-            ->get(['parcels.*','sales.parcels as totalParcels',
+            ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
                 'sales.contract_number as contract_number','sales.id as idSale']);  
             
             $data['startDate']=$dataFilterDate['startDate'];

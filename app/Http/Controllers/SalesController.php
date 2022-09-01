@@ -982,9 +982,10 @@ class SalesController extends Controller
         $data['finalDate']=date('Y-m-d',strtotime('+2 month'));
 
         $data['parcels']=Parcels::join('sales','parcels.id_sale','=','sales.id')
-            ->whereBetween('date', [$data['startDate'], $data['finalDate']])
+            ->join('interprises','sales.id_interprise','interprises.id')
+            ->whereBetween('parcels.date', [$data['startDate'], $data['finalDate']])
             ->orderBy('date','ASC')
-            ->get(['parcels.*','sales.parcels as totalParcels',
+            ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
                 'sales.contract_number as contract_number','sales.id as idSale']);        
         
         $orderFilter=$request->only(['contractCheck','deadlineCheck','paymentDateCheck']);
@@ -999,7 +1000,8 @@ class SalesController extends Controller
             $query=Parcels::query();
             
             $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
-            ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
+            ->join('interprises','sales.id_interprise','interprises.id')
+            ->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
             
             if($request->hasAny(['startDatePayment','finalDatePayment'])){
                 $dataFilterDate=$request->only(['startDate','finalDate','startDatePayment','finalDatePayment']);
@@ -1028,12 +1030,10 @@ class SalesController extends Controller
             }
 
             $data['parcels']=$query->orderBy('date','ASC')
-            ->get(['parcels.*','sales.parcels as totalParcels',
+            ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
                 'sales.contract_number as contract_number','sales.id as idSale']);  
-
         }
 
-         
         $data['startDate']=$request->has('startDate')?$dataFilterDate['startDate']:$data['startDate'];
         $data['finalDate']=$request->has('finalDate')?$dataFilterDate['finalDate']:$data['finalDate'];
         $data['startDatePayment']=$request->has('startDatePayment')?$dataFilterDate['startDatePayment']:'';
@@ -1063,9 +1063,10 @@ class SalesController extends Controller
             }
 
             $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
-            ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
-            ->orderBy('date','ASC')
-            ->get(['parcels.*','sales.parcels as totalParcels',
+            ->join('interprises','sales.id_interprise','interprises.id')
+            ->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
+            ->orderBy('parcels.date','ASC')
+            ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
             'sales.contract_number as contract_number','sales.id as idSale']);
 
             $data['contractCheck']=$request->has('contractCheck')?$orderFilter['contractCheck']:'';
@@ -1073,22 +1074,29 @@ class SalesController extends Controller
             $data['paymentDateCheck']=$request->has('paymentDateCheck')?$orderFilter['paymentDateCheck']:'';
         }
 
+        $data['interpriseName']="";
         $data['num']="";
         $data['date']="";
         $data['status']="";
         $data['contract_number']="";
         $data['pad_date']="";
         $data['our_number']="";
+        $data['type']="";
 
-        $dataParcelsEquals=$request->only(['num','date','status','pad_date']);
-        $dataParcelsLike=$request->only(['contract_number','our_number']);
+        $dataParcelsEquals=$request->only(['num','date','status','pad_date','type']);
+        $dataParcelsLike=$request->only(['contract_number','our_number','interpriseName']);
         
-        if($request->hasAny(['num','date','status','contract_number','pad_date','our_number'])){
+        if($request->hasAny(['num','interpriseName','date','status','type','contract_number','pad_date','our_number'])){
             $query=Parcels::query();
             foreach ($dataParcelsLike as $name => $value) {
                 if($name=="contract_number"){
                     $name="sales.contract_number";
                 }
+
+                if($name=="interpriseName"){
+                    $name="interprises.name";
+                }
+
                 if($value){
                     $query->where($name, 'LIKE', '%' . $value . '%');
                 }
@@ -1098,9 +1106,15 @@ class SalesController extends Controller
                 if($name=="contract_number"){
                     $name="sales.contract_number";
                 }
+
                 if($name=="status"){
                     $name="parcels.status";
                 }
+
+                if($name=="type"){
+                    $name="parcels.type";
+                }
+
                 if($value){
                     $query->where($name, '=', $value);
                 }
@@ -1108,7 +1122,7 @@ class SalesController extends Controller
 
             if(empty($dataParcelsEquals['status'])){
                 if($request->input('startDate') || $request->input('finalDate')){
-                    $query->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
+                    $query->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
                 }
 
                 if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
@@ -1134,27 +1148,29 @@ class SalesController extends Controller
                 
                 $data['parcels']=$query->where('status',"!=",1)
                     ->join('sales','parcels.id_sale','=','sales.id')
-                    ->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
-                    ->orderBy('date','ASC')
+                    ->join('interprises','sales.id_interprise','interprises.id')
+                    ->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']])
+                    ->orderBy('parcels.date','ASC')
                     ->get(['parcels.*','sales.parcels as totalParcels',
+                    'interprises.name as interprise_name',
                     'sales.contract_number as contract_number','sales.id as idSale']);
             }else{
                 if($request->input('startDate') || $request->input('finalDate')){
-                    $query->whereBetween('date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
+                    $query->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
                 }
 
-                if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
+                if($request->filledAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
                     foreach ($orderFilter as $name => $value) {
                         if($name=="contractCheck"){
                             $name="sales.contract_number";
                         }
             
                         if($name=="deadlineCheck"){
-                            $name="date";
+                            $name="parcels.date";
                         }
             
                         if($name=="paymentDateCheck"){
-                            $name="pad_date";
+                            $name="parcels.pad_date";
                         }
                         
                         if($value){
@@ -1164,16 +1180,18 @@ class SalesController extends Controller
                 }
                 
                 $data['parcels']=$query->join('sales','parcels.id_sale','=','sales.id')
-                    ->orderBy('date','ASC')
-                    ->get(['parcels.*','sales.parcels as totalParcels',
+                    ->join('interprises','sales.id_interprise','interprises.id')
+                    ->orderBy('parcels.date','ASC')
+                    ->get(['parcels.*','sales.parcels as totalParcels','interprises.name as interprise_name',
                     'sales.contract_number as contract_number','sales.id as idSale']);
                 }
                 $data['num']=$dataParcelsEquals['num'];
+                $data['interpriseName']=$dataParcelsLike['interpriseName'];
                 $data['date']=$dataParcelsEquals['date'];
                 $data['status']=$dataParcelsEquals['status'];
                 $data['contract_number']=$dataParcelsLike['contract_number'];
                 $data['pad_date']=$dataParcelsEquals['pad_date'];
-                $data['our_number']=$dataParcelsLike['our_number'];
+                $data['type']=$dataParcelsEquals['type'];
             }
 
         

@@ -100,10 +100,21 @@
                             
                             <form action="{{route('parcelsReport')}}" method="POST" target="_blank" style="margin-top: 22px;">
                                 @csrf
-                                <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
-                                <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
-                                <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
-                                <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
+                                @if($startDate!=="")
+                                    <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
+                                @endif
+
+                                @if($finalDate!=="")
+                                    <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
+                                @endif
+
+                                @if($startDatePayment!=="")
+                                    <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
+                                @endif
+
+                                @if($finalDatePayment!=="")
+                                    <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
+                                @endif
                                 <input class="form-control" value="{{$status}}" type="hidden" name="status">
                                 <input class="form-control" value="{{$contract_number}}" type="hidden" name="contract_number">
 
@@ -124,12 +135,22 @@
             <div class="table-responsive">
                 <form class="d-flex w-100" style="margin-top: 22px; 
                     width:550px;height:50px; border-bottom:1px solid #ccc; padding-bottom:25px;">
-                    
-                    <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
-                    <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
-                    <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
-                    <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
-                    
+                    @if($startDate!=="")
+                        <input class="form-control" value="{{$startDate}}" type="hidden" name="startDate">
+                    @endif
+
+                    @if($finalDate!=="")
+                        <input class="form-control" value="{{$finalDate}}" type="hidden" name="finalDate">
+                    @endif
+
+                    @if($startDatePayment!=="")
+                        <input class="form-control" value="{{$startDatePayment}}" type="hidden" name="startDatePayment">
+                    @endif
+
+                    @if($finalDatePayment!=="")
+                        <input class="form-control" value="{{$finalDatePayment}}" type="hidden" name="finalDatePayment">
+                    @endif
+                  
                     <label style="line-height:50px; margin-right:10px; font-size:15px;">Ordenar por:</label>
                     <div class="form-group m-1 h-100" style="line-height:40px;">
                         <input type="checkbox" {{$contractCheck?'checked':''}} name="contractCheck" class="md-1">
@@ -156,15 +177,13 @@
                         <th>Ações</th>
                         <th>Contrato</th>
                         <th>Numero</th>
-                        <th>Nosso Numero</th>
+                        <th>Empreendimento</th>
                         <th>Tipo</th>
                         <th>Vencimento</th>
                         <th>Valor</th>
-                        <th>Acrescimo</th>
-                        <th>Atualizado</th>
                         <th>Valor Pago</th>
                         <th>Data Pagamento</th>
-                        <th>Boleto</th>
+                        <!--<th>Boleto</th>-->
                         <th>Status</th>
                     </thead>
                     <tbody>
@@ -185,25 +204,23 @@
                                     <input class="form-control" type="number" name="num" value="{{$num}}">
                                 </td>
                                 <td>
-                                    <input class="form-control" type="number" name="our_number" value="{{$our_number}}">
+                                    <input class="form-control" type="text" name="interpriseName" value="{{$interpriseName}}">
                                 </td>
+                               
                                 <td>
                                     <select name="type" class="form-control selectFilter">
                                         <option value="0"></option>
-                                        <option value="1">Financiamento</option>
-                                        <option value="2">Taxa</option>
+                                        <option value="1" {{$type==1?'selected':''}}>Financiamento</option>
+                                        <option value="2" {{$type==2?'selected':''}}>Taxa</option>
                                     </select>
                                 </td>
                                 <td >
                                     <input class="form-control" type="date" name="date" value="{{$date}}">
                                 </td>
-                                <td></td>
-                                <td></td>
+                                
                                 <td></td>
                                 <td></td>
                                 <td><input class="form-control" type="date" name="pad_date" value="{{$pad_date}}"></td>
-                                <td></td>
-
                                 <td>
                                     <select name="status" class="form-control selectFilter">
                                         <option value="0"></option>
@@ -233,7 +250,8 @@
                                     {{$parcel->contract_number}}</a>
                                 </td>
                                 <td style="width: 50px">{{$parcel->num."/".$parcel->totalParcels}}</td>
-                                <td style="min-width: 150px">{{$parcel->our_number}}</td>
+                                <td>{{$parcel->interprise_name}}</td>
+
                                 <td>
                                     @if ($parcel->type==1)
                                         Financiamento - {{$parcel->prefix}}
@@ -247,8 +265,6 @@
                                 </td>
                                 <td>{{date('d/m/Y',strtotime($parcel->date))}}</td>
                                 <td style="min-width: 90px">{{$parcel->value}}</td>
-                                <td>{{!empty($parcel->added_value)?$parcel->added_value:'0,00'}}</td>
-                                <td>{{!empty($parcel->updated_value)?$parcel->updated_value:'0,00'}}</td>
                                 <td style="min-width: 100px">
                                     @if($parcel->send_bankSlip==0)
                                         {{!empty($parcel->pad_value)?str_replace(['.','.'],['',','],$parcel->pad_value):'0,00'}}
@@ -257,11 +273,11 @@
                                     @endif
                                 </td>
                                 <td>{{!empty($parcel->pad_date)?date('d/m/Y',strtotime($parcel->pad_date)):'Não pago'}}</td>
-                                <td>
+                                <!--<td>
                                     @if($parcel['bankSlip'])
                                         <a href="{{asset('storage/bankSlip/'.$parcel['bankSlip']->path)}}" download>Download Boleto</a>
                                     @endif
-                                </td>
+                                </td>-->
                                 <td style="min-width: 125px;">
                                     @if ($parcel->status==1)
                                         Paga  
