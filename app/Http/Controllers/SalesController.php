@@ -1159,7 +1159,7 @@ class SalesController extends Controller
                     $query->whereBetween('parcels.date', [$dataFilterDate['startDate'], $dataFilterDate['finalDate']]);
                 }
 
-                if($request->filledAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
+                if($request->hasAny(['contractCheck','deadlineCheck','paymentDateCheck'])){
                     foreach ($orderFilter as $name => $value) {
                         if($name=="contractCheck"){
                             $name="sales.contract_number";

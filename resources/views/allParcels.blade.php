@@ -248,12 +248,12 @@
                                 <td style="min-width: 150px"> 
                                     <a style="color: blue;" href="{{route('seeSale',['idSale'=>$parcel->idSale])}}">
                                     {{$parcel->contract_number}}</a>
-                                </td>
-                                <td style="width: 50px">{{$parcel->num."/".$parcel->totalParcels}}</td>
+                                </td>                   
+                                <td style="width: 50px">{{$parcel->num!=""?$parcel->num.'/'.$parcel->totalParcels:$parcel->num_reissue}}</td>
                                 <td>{{$parcel->interprise_name}}</td>
 
                                 <td>
-                                    @if ($parcel->type==1)
+                                    @if ($parcel->type==1 || $parcel->type==6)
                                         Financiamento - {{$parcel->prefix}}
                                     @elseif($parcel->type==2)
                                         Taxas - {{$parcel->prefix}}
